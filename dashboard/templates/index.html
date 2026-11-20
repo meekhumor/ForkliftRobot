@@ -2,44 +2,121 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0b1120">
-  <title>Forklift Robot | Control Center</title>
+  <title>Forklift Robot | Unified Autonomous Control Center</title>
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+  <!-- TOPBAR -->
   <header class="topbar">
     <div class="brand">
       <div class="brand-icon">F</div>
       <div>
         <h1>FORKLIFT ROBOT</h1>
-        <p>AUTONOMOUS CONTROL CENTER</p>
+        <p>UNIFIED CONTROL CENTER</p>
       </div>
     </div>
 
-    <div class="connection">
-      <span class="status-dot"></span>
-      <span id="connectionStatus">Connecting...</span>
+    <div class="header-actions">
+      <div class="connection">
+        <span class="status-dot" id="rosDot"></span>
+        <span id="connectionStatus">ROS: Connecting...</span>
+      </div>
+
+      <div class="connection">
+        <span class="status-dot" id="espDot"></span>
+        <span id="espStatus">ESP32: Checking...</span>
+      </div>
+
+      <button class="header-estop" id="quickEstop">E-STOP</button>
     </div>
   </header>
 
   <main class="dashboard">
 
-    <!-- LIVE LIDAR MAP -->
+    <!-- PANEL 1: MANUAL RC & FORKLIFT CONTROLS (FORMERLY ON ESP32) -->
+    <section class="panel rc-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Manual Motor & Forklift Remote</h2>
+          <p>Direct skid-steer wheel drive & fork lift controls</p>
+        </div>
+        <span class="tag" id="motorLinkTag">LINK: IDLE</span>
+      </div>
+
+      <!-- DIRECTIONAL KEYPAD -->
+      <div class="drive-grid">
+        <span class="empty-cell"></span>
+        <button class="drive-btn" data-drive="F">
+          <span class="arrow">▲</span>FORWARD
+        </button>
+        <span class="empty-cell"></span>
+
+        <button class="drive-btn" data-drive="L">
+          <span class="arrow">↶</span>TURN LEFT
+        </button>
+        <button class="drive-btn stop-btn" id="rcStop">
+          <span class="arrow">■</span>STOP
+        </button>
+        <button class="drive-btn" data-drive="R">
+          <span class="arrow">↷</span>TURN RIGHT
+        </button>
+
+        <span class="empty-cell"></span>
+        <button class="drive-btn" data-drive="B">
+          <span class="arrow">▼</span>BACKWARD
+        </button>
+        <span class="empty-cell"></span>
+      </div>
+
+      <!-- SPEED SLIDER -->
+      <div class="speed-section">
+        <div class="speed-header">
+          <span>DRIVE MOTOR SPEED (PWM)</span>
+          <strong id="speedValue">120</strong>
+        </div>
+        <input class="speed-slider" id="speed" type="range" min="60" max="255" value="120">
+      </div>
+
+      <!-- FORKLIFT MECHANISM -->
+      <div class="panel-heading" style="margin-bottom: 8px;">
+        <div>
+          <h2 style="font-size: 14px;">Forklift Mechanism</h2>
+        </div>
+      </div>
+      <div class="lift-grid">
+        <button class="lift-btn" data-lift="UP">
+          <span class="arrow">⬆</span>RAISE FORK
+        </button>
+        <button class="lift-btn" data-lift="DOWN">
+          <span class="arrow">⬇</span>LOWER FORK
+        </button>
+      </div>
+
+      <button class="estop-btn" id="emergency">EMERGENCY STOP · ALL MOTORS</button>
+
+      <p class="keyboard-hint">
+        <strong>Hold button to move, release to stop.</strong><br>
+        Keyboard: <code>W</code>=Forward, <code>S</code>=Backward, <code>A</code>=Left, <code>D</code>=Right, <code>R</code>=Raise, <code>F</code>=Lower, <code>Space</code>=E-Stop.
+      </p>
+    </section>
+
+    <!-- PANEL 2: LIVE LIDAR MAP & SLAM -->
     <section class="panel map-panel">
       <div class="panel-heading">
         <div>
-          <h2>Live LiDAR Map</h2>
-          <p>Environment scanning and robot position</p>
+          <h2>Live LiDAR Map & SLAM</h2>
+          <p>Environment scanning, occupancy map & goal selection</p>
         </div>
         <span class="tag" id="mapStatus">WAITING</span>
       </div>
 
-      <div class="visual-area" id="mapView">
+      <div class="visual-area" id="mapView" style="cursor: crosshair;">
         <div class="placeholder">
           <div class="placeholder-icon">⌖</div>
           <h3>LiDAR Map</h3>
-          <p>Waiting for ROS data</p>
+          <p>Waiting for ROS /scan or /map data</p>
         </div>
       </div>
 
@@ -47,10 +124,46 @@
         <button class="button primary" id="startMapping">Start Mapping</button>
         <button class="button" id="stopMapping">Stop Mapping</button>
         <button class="button" id="saveMap">Save Map</button>
+        <button class="button" id="startNav2" style="background: #1e3a8a; border-color: #3b82f6;">Start Nav2 Stack</button>
+        <button class="button" id="stopNav2">Stop Nav2</button>
       </div>
     </section>
 
-    <!-- STEREO CAMERA -->
+    <!-- PANEL 3: AUTONOMOUS NAVIGATION TARGET -->
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Autonomous Navigation Goal</h2>
+          <p>Tap map above or specify coordinates in map frame</p>
+        </div>
+        <span class="tag" id="navGoalStatus">GOAL: NONE</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px;">
+        <div>
+          <label style="font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 4px;">Target X (m)</label>
+          <input id="nav-x" type="number" step="0.05" value="0.0" style="width: 100%; padding: 10px; border-radius: 8px; background: var(--surface-light); border: 1px solid var(--border); color: var(--text); box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 4px;">Target Y (m)</label>
+          <input id="nav-y" type="number" step="0.05" value="0.0" style="width: 100%; padding: 10px; border-radius: 8px; background: var(--surface-light); border: 1px solid var(--border); color: var(--text); box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 4px;">Target Yaw (rad)</label>
+          <input id="nav-yaw" type="number" step="0.1" value="0.0" style="width: 100%; padding: 10px; border-radius: 8px; background: var(--surface-light); border: 1px solid var(--border); color: var(--text); box-sizing: border-box;">
+        </div>
+      </div>
+
+      <button id="send-goal-btn" class="button primary full" style="min-height: 48px; font-weight: bold; font-size: 14px;">
+        NAVIGATE TO TARGET POSE
+      </button>
+
+      <button id="cancel-goal-btn" class="button full" style="margin-top: 8px; background: #374151; border-color: #4b5563;">
+        CANCEL NAVIGATION
+      </button>
+    </section>
+
+    <!-- PANEL 4: LIVE STEREO CAMERA -->
     <section class="panel camera-panel">
       <div class="panel-heading">
         <div>
@@ -62,7 +175,6 @@
 
       <div class="visual-area camera-view">
         <img id="cameraFeed" alt="Live robot camera feed">
-
         <div class="camera-placeholder" id="cameraPlaceholder">
           <div class="placeholder-icon">◉</div>
           <h3>Camera Feed</h3>
@@ -86,62 +198,12 @@
       </div>
     </section>
 
-    <!-- NAVIGATION -->
-    <section class="panel">
-      <div class="panel-heading">
-        <div>
-          <h2>Navigation</h2>
-          <p>Choose source and delivery destination</p>
-        </div>
-      </div>
-
-      <div class="form-area">
-        <label for="source">Source</label>
-        <select id="source">
-          <option value="">Select source</option>
-        </select>
-
-        <label for="destination">Destination</label>
-        <select id="destination">
-          <option value="">Select destination</option>
-        </select>
-
-        <button class="button primary full" id="startNavigation">
-          Start Navigation
-        </button>
-
-        <button class="button full" id="cancelNavigation">
-          Cancel Navigation
-        </button>
-      </div>
-    </section>
-
-    <!-- MANUAL COORDINATE NAVIGATION TARGET PANEL -->
-    <section class="panel">
-      <div class="heading" style="margin-bottom: 12px; font-size: 0.85rem; font-weight: bold; color: var(--muted, #aab5c4); text-transform: uppercase; letter-spacing: 0.05em;">Autonomous Navigation Target</div>
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px;">
-        <div>
-          <label style="font-size: 0.75rem; color: var(--muted, #aab5c4); display: block; margin-bottom: 4px;">X (meters)</label>
-          <input id="nav-x" type="number" step="0.1" value="0.0" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--button, #293548); border: 1px solid #293344; color: var(--text, #f4f7fb); box-sizing: border-box;">
-        </div>
-        <div>
-          <label style="font-size: 0.75rem; color: var(--muted, #aab5c4); display: block; margin-bottom: 4px;">Y (meters)</label>
-          <input id="nav-y" type="number" step="0.1" value="0.0" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--button, #293548); border: 1px solid #293344; color: var(--text, #f4f7fb); box-sizing: border-box;">
-        </div>
-        <div>
-          <label style="font-size: 0.75rem; color: var(--muted, #aab5c4); display: block; margin-bottom: 4px;">Yaw (radians)</label>
-          <input id="nav-yaw" type="number" step="0.1" value="0.0" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--button, #293548); border: 1px solid #293344; color: var(--text, #f4f7fb); box-sizing: border-box;">
-        </div>
-      </div>
-      <button id="send-goal-btn" class="button primary full" style="width: 100%; min-height: 48px; background: var(--accent, #38a7ff); color: #071522; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;">SEND NAVIGATION GOAL</button>
-    </section>
-
-    <!-- DETECTED BOXES -->
+    <!-- PANEL 5: DETECTED BOXES -->
     <section class="panel">
       <div class="panel-heading">
         <div>
           <h2>Detected Boxes</h2>
-          <p>ArUco marker identification</p>
+          <p>Vision-based pallet and package tracking</p>
         </div>
       </div>
 
@@ -155,7 +217,6 @@
               <th>Status</th>
             </tr>
           </thead>
-
           <tbody id="boxTable">
             <tr>
               <td colspan="4" class="empty">No boxes detected</td>
@@ -165,44 +226,47 @@
       </div>
     </section>
 
-    <!-- ROBOT STATUS -->
+    <!-- PANEL 6: SYSTEM STATUS & CONFIG -->
     <section class="panel status-panel">
       <div class="panel-heading">
         <div>
-          <h2>Robot Status</h2>
-          <p>System and sensor overview</p>
+          <h2>System Telemetry & Network Config</h2>
+          <p>Node statuses, hardware links and ESP32 IP configuration</p>
         </div>
       </div>
 
       <div class="status-grid">
         <div class="status-item">
-          <span>LiDAR</span>
-          <strong id="lidarStatus">--</strong>
+          <span>LiDAR Node</span>
+          <strong id="lidarStatus">Stopped</strong>
         </div>
 
         <div class="status-item">
-          <span>Camera</span>
-          <strong id="cameraStatus">--</strong>
+          <span>ROS 2 Bridge</span>
+          <strong id="rosStatus">Offline</strong>
         </div>
 
         <div class="status-item">
-          <span>ROS 2</span>
-          <strong id="rosStatus">--</strong>
-        </div>
-
-        <div class="status-item">
-          <span>Motors</span>
-          <strong id="motorStatus">Not connected</strong>
+          <span>ESP32 Controller</span>
+          <strong id="espMotorStatus">Disconnected</strong>
         </div>
 
         <div class="status-item">
           <span>Robot Mode</span>
-          <strong id="robotMode">Idle</strong>
+          <strong id="robotMode">Manual RC</strong>
         </div>
 
         <div class="status-item">
-          <span>Battery</span>
-          <strong id="batteryStatus">--</strong>
+          <span>Autonomous Nav2</span>
+          <strong id="nav2Status">Inactive</strong>
+        </div>
+
+        <div class="status-item">
+          <span>Hotspot IP Config</span>
+          <div class="ip-config-box">
+            <input class="ip-input" id="espIpInput" type="text" value="172.20.10.3" placeholder="ESP32 IP">
+            <button class="button" id="saveIpBtn" style="min-height: 32px; padding: 6px 12px;">Save</button>
+          </div>
         </div>
       </div>
     </section>
@@ -210,51 +274,15 @@
   </main>
 
   <footer>
-    FORKLIFT ROBOT CONTROL CENTER
+    AUTONOMOUS FORKLIFT ROBOT CONTROL CENTER
     <span>•</span>
-    LOCAL NETWORK
+    NVIDIA JETSON + ESP32 ON HOTSPOT
   </footer>
 
   <!-- ROS communication library -->
   <script src="https://cdn.jsdelivr.net/npm/roslib/build/roslib.min.js"></script>
 
-  <!-- Dashboard controller script -->
+  <!-- Unified Dashboard Controller Script -->
   <script src="/static/js/dashboard.js"></script>
-
-  <!-- Navigation Goal Dispatch Handler Script -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const sendGoalBtn = document.getElementById('send-goal-btn');
-      if (sendGoalBtn) {
-        sendGoalBtn.addEventListener('click', () => {
-          const x = parseFloat(document.getElementById('nav-x').value) || 0.0;
-          const y = parseFloat(document.getElementById('nav-y').value) || 0.0;
-          const yaw = parseFloat(document.getElementById('nav-yaw').value) || 0.0;
-
-          fetch('/api/navigate', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ x: x, y: y, yaw: yaw })
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              console.log("Goal dispatched successfully:", data.message);
-              alert("Navigation goal sent successfully!");
-            } else {
-              console.error("Failed to dispatch goal:", data.error);
-              alert("Failed to send goal: " + data.error);
-            }
-          })
-          .catch(err => {
-            console.error("Network error:", err);
-            alert("Network error while sending navigation goal.");
-          });
-        });
-      }
-    });
-  </script>
 </body>
 </html>

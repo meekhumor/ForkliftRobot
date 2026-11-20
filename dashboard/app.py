@@ -5,7 +5,10 @@ import threading
 import shlex
 import json
 import math
-
+import time
+import urllib.request
+import urllib.error
+import urllib.parse
 from pathlib import Path
 
 from flask import Flask, jsonify, render_template, request
@@ -21,7 +24,16 @@ MAP_DIR.mkdir(parents=True, exist_ok=True)
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
-# These are fixed commands; the browser cannot submit shell commands.
+# ESP32 Motor Controller Configuration (communicates over phone hotspot)
+esp32_config = {
+    "ip": os.environ.get("ESP32_IP", "172.20.10.3"),
+    "port": int(os.environ.get("ESP32_PORT", 80)),
+    "online": False,
+    "last_check": 0,
+    "telemetry": {}
+}
+
+# Fixed ROS processes
 COMMANDS = {
     "lidar": (
         f"source {ROS_SETUP} && source {WS_SETUP} && "
@@ -43,6 +55,18 @@ COMMANDS = {
         f"slam_params_file:={PROJECT}/config/forklift_slam.yaml "
         "use_sim_time:=false"
     ),
+    "localization": (
+        f"source {ROS_SETUP} && source {WS_SETUP} && "
+        f"exec ros2 launch {PROJECT}/lidar/launch/localization.launch.py"
+    ),
+    "navigation": (
+        f"source {ROS_SETUP} && source {WS_SETUP} && "
+        f"exec ros2 launch {PROJECT}/lidar/launch/navigation.launch.py"
+    ),
+    "bridge": (
+        f"source {ROS_SETUP} && source {WS_SETUP} && "
+        f"exec ros2 run forklift_bridge cmd_vel_to_esp32 --ros-args -p esp32_ip:={esp32_config['ip']}"
+    ),
 }
 
 processes = {}
@@ -61,8 +85,13 @@ def start_process(name):
 
     log_file = open(LOG_DIR / f"{name}.log", "a", buffering=1)
 
+    # Dynamic command adjustment for bridge with current ESP32 IP
+    cmd = COMMANDS[name]
+    if name == "bridge":
+        cmd = f"source {ROS_SETUP} && source {WS_SETUP} && exec ros2 run forklift_bridge cmd_vel_to_esp32 --ros-args -p esp32_ip:={esp32_config['ip']}"
+
     proc = subprocess.Popen(
-        ["bash", "-lc", COMMANDS[name]],
+        ["bash", "-lc", cmd],
         cwd=str(PROJECT),
         stdout=log_file,
         stderr=subprocess.STDOUT,
@@ -106,6 +135,63 @@ def mapping_status():
     }
 
 
+def nav2_status():
+    return {
+        name: process_running(name)
+        for name in ("lidar", "transform", "odometry", "localization", "navigation", "bridge")
+    }
+
+
+# ---------------- ESP32 Communication Helpers ----------------
+
+def send_esp32_cmd(action, speed=120, timeout=0.35):
+    """Send manual movement / lift action to the ESP32."""
+    url = f"http://{esp32_config['ip']}:{esp32_config['port']}/cmd?a={urllib.parse.quote(str(action))}&s={int(speed)}"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "JetsonDashboard/1.0"})
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            esp32_config["online"] = True
+            return True, resp.read().decode("utf-8", errors="ignore")
+    except Exception as e:
+        esp32_config["online"] = False
+        return False, str(e)
+
+
+def send_esp32_drive(left, right, timeout=0.35):
+    """Send continuous left/right speed to the ESP32."""
+    url = f"http://{esp32_config['ip']}:{esp32_config['port']}/drive?l={int(left)}&r={int(right)}"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "JetsonDashboard/1.0"})
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            esp32_config["online"] = True
+            return True, resp.read().decode("utf-8", errors="ignore")
+    except Exception as e:
+        esp32_config["online"] = False
+        return False, str(e)
+
+
+def poll_esp32_status(timeout=0.4):
+    """Check ESP32 connection and retrieve telemetry."""
+    now = time.time()
+    if now - esp32_config["last_check"] < 2.0:
+        return esp32_config["online"]
+
+    esp32_config["last_check"] = now
+    url = f"http://{esp32_config['ip']}:{esp32_config['port']}/status"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "JetsonDashboard/1.0"})
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            data = json.loads(resp.read().decode("utf-8", errors="ignore"))
+            esp32_config["online"] = True
+            esp32_config["telemetry"] = data
+            return True
+    except Exception:
+        esp32_config["online"] = False
+        return False
+
+
+# ---------------- Web Routes ----------------
+
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -116,17 +202,90 @@ def health():
     return jsonify(status="online", project="Forklift Robot Control Center")
 
 
+@app.route("/api/config", methods=["GET", "POST"])
+def api_config():
+    """Get or update ESP32 controller IP address."""
+    if request.method == "POST":
+        data = request.get_json() or {}
+        new_ip = data.get("ip") or request.form.get("ip")
+        new_port = data.get("port") or request.form.get("port")
+        if new_ip:
+            esp32_config["ip"] = str(new_ip).strip()
+        if new_port:
+            esp32_config["port"] = int(new_port)
+        poll_esp32_status(timeout=0.6)
+
+    return jsonify(
+        ip=esp32_config["ip"],
+        port=esp32_config["port"],
+        online=esp32_config["online"],
+        telemetry=esp32_config["telemetry"]
+    )
+
+
 @app.route("/api/status")
 def api_status():
     with lock:
-        state = mapping_status()
+        m_state = mapping_status()
+        n_state = nav2_status()
+
+    # Async check ESP32 status
+    poll_esp32_status()
 
     return jsonify(
         status="online",
-        mapping=any(state.values()),
-        processes=state,
+        mapping=m_state["slam"],
+        navigating=n_state["navigation"],
+        esp32_online=esp32_config["online"],
+        esp32_ip=esp32_config["ip"],
+        processes={**m_state, **n_state},
+        telemetry=esp32_config["telemetry"],
     )
 
+
+@app.route("/api/motor", methods=["GET", "POST"])
+def api_motor():
+    """Relay RC buttons / speed adjustments from the Jetson web UI to the ESP32."""
+    action = request.args.get("a")
+    speed = request.args.get("s", 120)
+    left = request.args.get("l")
+    right = request.args.get("r")
+
+    if request.is_json:
+        body = request.get_json()
+        action = action or body.get("action") or body.get("a")
+        speed = body.get("speed") or body.get("s") or speed
+        left = left or body.get("left") or body.get("l")
+        right = right or body.get("right") or body.get("r")
+
+    if left is not None and right is not None:
+        ok, msg = send_esp32_drive(left, right)
+        return jsonify(success=ok, message=msg)
+
+    if not action:
+        return jsonify(success=False, error="Missing action 'a' or drive values 'l','r'"), 400
+
+    ok, msg = send_esp32_cmd(action, speed)
+    return jsonify(success=ok, message=msg)
+
+
+@app.route("/api/estop", methods=["POST"])
+def api_estop():
+    """Emergency Stop: immediately halts all ESP32 motors and stops ROS movement."""
+    # 1. Direct hardware stop on ESP32
+    ok, msg = send_esp32_cmd("X")
+
+    # 2. Publish zero cmd_vel in ROS
+    stop_cmd = (
+        f"source {ROS_SETUP} && "
+        "ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist '{linear: {x: 0, y: 0, z: 0}, angular: {x: 0, y: 0, z: 0}}'"
+    )
+    subprocess.Popen(["bash", "-lc", stop_cmd], start_new_session=True)
+
+    return jsonify(success=True, message="EMERGENCY STOP dispatched to all systems")
+
+
+# ---------------- Mapping Controls ----------------
 
 @app.route("/api/mapping/start", methods=["POST"])
 def mapping_start():
@@ -136,11 +295,9 @@ def mapping_start():
         try:
             for name in order:
                 start_process(name)
-                # Give each ROS process a moment to initialize.
                 if processes[name].poll() is not None:
                     raise RuntimeError(f"{name} exited during startup")
-
-                threading.Event().wait(2)
+                threading.Event().wait(1.5)
 
             return jsonify(
                 success=True,
@@ -151,7 +308,6 @@ def mapping_start():
         except Exception as exc:
             for name in reversed(order):
                 stop_process(name)
-
             return jsonify(success=False, error=str(exc)), 500
 
 
@@ -163,7 +319,7 @@ def mapping_stop():
 
         return jsonify(
             success=True,
-            message="Dashboard-managed mapping processes stopped",
+            message="Mapping processes stopped",
             processes=mapping_status(),
         )
 
@@ -171,7 +327,6 @@ def mapping_stop():
 @app.route("/api/map/save", methods=["POST"])
 def map_save():
     output = MAP_DIR / "forklift_map"
-
     command = (
         f"source {ROS_SETUP} && source {WS_SETUP} && "
         f"ros2 run nav2_map_server map_saver_cli -f {output}"
@@ -205,32 +360,69 @@ def map_save():
         return jsonify(success=False, error="Map save timed out"), 504
 
 
+# ---------------- Nav2 Autonomous Navigation ----------------
+
+@app.route("/api/nav2/start", methods=["POST"])
+def nav2_start():
+    order = ("lidar", "transform", "odometry", "localization", "navigation", "bridge")
+
+    with lock:
+        if process_running("slam"):
+            stop_process("slam")
+
+        try:
+            for name in order:
+                start_process(name)
+                if processes[name].poll() is not None:
+                    raise RuntimeError(f"{name} exited during startup")
+                threading.Event().wait(1.5)
+
+            return jsonify(
+                success=True,
+                message="Autonomous navigation stack started successfully",
+                processes=nav2_status(),
+            )
+        except Exception as exc:
+            for name in reversed(order):
+                stop_process(name)
+            return jsonify(success=False, error=str(exc)), 500
+
+
+@app.route("/api/nav2/stop", methods=["POST"])
+def nav2_stop():
+    with lock:
+        for name in ("bridge", "navigation", "localization"):
+            stop_process(name)
+
+        return jsonify(
+            success=True,
+            message="Autonomous navigation stack stopped",
+            processes=nav2_status(),
+        )
+
+
 @app.route("/api/navigate", methods=["POST"])
 def api_navigate():
-    """Securely dispatch navigation goals to Nav2 via ros2 action send_goal."""
+    """Dispatch navigation goals to Nav2 via NavigateToPose action."""
     try:
         data = request.get_json() or {}
         x = float(data.get("x", 0.0))
         y = float(data.get("y", 0.0))
         yaw = float(data.get("yaw", 0.0))
 
-        # Convert yaw to quaternion (qz, qw) for 2D planar rotation
         qz = math.sin(yaw / 2.0)
         qw = math.cos(yaw / 2.0)
 
-        # Construct the Nav2 goal YAML structure safely using json
         goal_msg = {
             "pose": {
-                "header": {
-                    "frame_id": "map"
-                },
+                "header": {"frame_id": "map"},
                 "pose": {
                     "position": {"x": x, "y": y, "z": 0.0},
                     "orientation": {"x": 0.0, "y": 0.0, "z": qz, "w": qw}
                 }
             }
         }
-        
+
         goal_yaml = json.dumps(goal_msg)
         safe_goal_arg = shlex.quote(goal_yaml)
 
@@ -239,7 +431,6 @@ def api_navigate():
             f"ros2 action send_goal /navigate_to_pose nav2_msgs/action/NavigateToPose {safe_goal_arg}"
         )
 
-        # Dispatch asynchronously so the web request doesn't block waiting for navigation to complete
         subprocess.Popen(
             ["bash", "-lc", command],
             cwd=str(PROJECT),
@@ -248,12 +439,26 @@ def api_navigate():
             start_new_session=True,
         )
 
-        return jsonify(success=True, message=f"Navigation goal sent to X: {x}, Y: {y}, Yaw: {yaw}")
+        return jsonify(success=True, message=f"Navigation goal dispatched to X: {x:.2f}, Y: {y:.2f}, Yaw: {yaw:.2f}")
 
     except Exception as exc:
         return jsonify(success=False, error=str(exc)), 500
 
 
+@app.route("/api/navigate/cancel", methods=["POST"])
+def api_navigate_cancel():
+    """Halt navigation and stop motors."""
+    send_esp32_cmd("S")
+
+    stop_cmd = (
+        f"source {ROS_SETUP} && "
+        "ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist '{linear: {x: 0, y: 0, z: 0}, angular: {x: 0, y: 0, z: 0}}'"
+    )
+    subprocess.Popen(["bash", "-lc", stop_cmd], start_new_session=True)
+
+    return jsonify(success=True, message="Navigation cancelled")
+
+
 if __name__ == "__main__":
-    print("Forklift Robot Dashboard starting on port 8000")
+    print("Forklift Robot Complete Control Center starting on port 8000...")
     app.run(host="0.0.0.0", port=8000, debug=False)
