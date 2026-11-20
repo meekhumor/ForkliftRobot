@@ -58,13 +58,16 @@ COMMANDS = {
     ),
     "localization": (
         f"source {ROS_SETUP} && source {WS_SETUP} && "
-        f"exec ros2 launch {PROJECT}/lidar/launch/localization.launch.py "
+        f"exec ros2 launch nav2_bringup localization_launch.py "
         f"map:={PROJECT}/maps/forklift_map.yaml "
-        f"params_file:={PROJECT}/config/navigation/nav2_params.yaml"
+        f"params_file:={PROJECT}/config/navigation/nav2_params.yaml "
+        "use_sim_time:=false"
     ),
     "navigation": (
         f"source {ROS_SETUP} && source {WS_SETUP} && "
-        f"exec ros2 launch {PROJECT}/lidar/launch/navigation.launch.py"
+        f"exec ros2 launch nav2_bringup navigation_launch.py "
+        f"params_file:={PROJECT}/config/navigation/nav2_params.yaml "
+        "use_sim_time:=false"
     ),
     "bridge": (
         f"source {ROS_SETUP} && source {WS_SETUP} && "
@@ -442,6 +445,18 @@ def nav2_start():
         if process_running("slam"):
             stop_process("slam")
 
+        # Hard-kill any stale Nav2 processes left from previous failed runs
+        # to prevent lifecycle nodes being stuck in 'inactive' state
+        try:
+            subprocess.run(
+                ["pkill", "-9", "-f",
+                 "nav2_map_server|nav2_amcl|lifecycle_manager|controller_server|planner_server|bt_navigator|behavior_server|velocity_smoother|waypoint_follower|smoother_server"],
+                stderr=subprocess.DEVNULL
+            )
+            time.sleep(0.5)
+        except Exception:
+            pass
+
         try:
             for name in order:
                 start_process(name)
@@ -465,6 +480,16 @@ def nav2_stop():
     with lock:
         for name in ("bridge", "navigation", "localization"):
             stop_process(name)
+
+        # Also hard-kill any Nav2 zombie processes
+        try:
+            subprocess.run(
+                ["pkill", "-9", "-f",
+                 "nav2_map_server|nav2_amcl|lifecycle_manager|controller_server|planner_server|bt_navigator|behavior_server|velocity_smoother|waypoint_follower|smoother_server"],
+                stderr=subprocess.DEVNULL
+            )
+        except Exception:
+            pass
 
         return jsonify(
             success=True,
