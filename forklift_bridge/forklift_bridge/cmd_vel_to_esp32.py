@@ -6,6 +6,7 @@ over the phone hotspot via HTTP.
 """
 
 import time
+import threading
 import requests
 import rclpy
 from rclpy.node import Node
@@ -53,6 +54,8 @@ class CmdVelToESP32(Node):
         self.session = requests.Session()
         adapter = requests.adapters.HTTPAdapter(pool_connections=2, pool_maxsize=4, max_retries=0)
         self.session.mount("http://", adapter)
+        self.http_pending = False
+        self.last_config_check = 0.0
 
         self.cmd_sub = self.create_subscription(
             Twist,
@@ -71,6 +74,21 @@ class CmdVelToESP32(Node):
         timer_period = 1.0 / self.rate_hz
         self.timer = self.create_timer(timer_period, self.control_loop)
 
+    def sync_esp32_ip(self):
+        """Check if user updated ESP32 IP in dashboard web UI."""
+        try:
+            r = requests.get("http://127.0.0.1:8000/api/config", timeout=0.25)
+            if r.status_code == 200:
+                cfg = r.json()
+                new_ip = cfg.get("ip")
+                if new_ip and new_ip != self.esp32_ip:
+                    self.esp32_ip = new_ip
+                    self.drive_endpoint = f"http://{self.esp32_ip}:{self.esp32_port}/drive"
+                    self.cmd_endpoint = f"http://{self.esp32_ip}:{self.esp32_port}/cmd"
+                    self.get_logger().info(f"Updated ESP32 IP from dashboard -> {self.drive_endpoint}")
+        except Exception:
+            pass
+
     def cmd_vel_callback(self, msg: Twist):
         self.target_vx = msg.linear.x
         self.target_wz = msg.angular.z
@@ -81,7 +99,7 @@ class CmdVelToESP32(Node):
             self.target_vx = 0.0
             self.target_wz = 0.0
             try:
-                self.session.get(f"{self.cmd_endpoint}?a=X", timeout=0.2)
+                self.session.get(f"{self.cmd_endpoint}?a=X", timeout=0.3)
             except Exception:
                 pass
 
@@ -93,8 +111,32 @@ class CmdVelToESP32(Node):
         pwm = self.min_pwm + ratio * (self.max_pwm - self.min_pwm)
         return int(sign * round(max(self.min_pwm, min(self.max_pwm, pwm))))
 
+    def _async_send(self, url, pwm_l, pwm_r, send_time):
+        try:
+            resp = self.session.get(url, timeout=(0.35, 0.35))
+            if resp.status_code == 200:
+                self.last_sent_l = pwm_l
+                self.last_sent_r = pwm_r
+                self.last_send_time = send_time
+                self.is_stopped = (pwm_l == 0 and pwm_r == 0)
+        except Exception as e:
+            now = time.time()
+            if (now - self.last_error_time) > 2.0:
+                self.get_logger().warn(f"ESP32 ({self.esp32_ip}) communication timeout: {e}")
+                self.last_error_time = now
+                self.sync_esp32_ip()
+        finally:
+            self.http_pending = False
+
     def control_loop(self):
         now = time.time()
+
+        # Periodically re-sync ESP32 IP if there were errors
+        if (now - self.last_config_check) > 4.0:
+            self.last_config_check = now
+            if (now - self.last_error_time) < 10.0:
+                self.sync_esp32_ip()
+
         if (now - self.last_cmd_time) > self.timeout_sec:
             vx = 0.0
             wz = 0.0
@@ -113,23 +155,14 @@ class CmdVelToESP32(Node):
         heartbeat_needed = (pwm_l != 0 or pwm_r != 0) and ((now - self.last_send_time) > 0.25)
         stop_confirmation = (pwm_l == 0 and pwm_r == 0) and not self.is_stopped
 
-        if speed_changed or heartbeat_needed or stop_confirmation:
+        if (speed_changed or heartbeat_needed or stop_confirmation) and not self.http_pending:
             url = f"{self.drive_endpoint}?l={pwm_l}&r={pwm_r}"
-            try:
-                resp = self.session.get(url, timeout=0.18)
-                if resp.status_code == 200:
-                    self.last_sent_l = pwm_l
-                    self.last_sent_r = pwm_r
-                    self.last_send_time = now
-                    self.is_stopped = (pwm_l == 0 and pwm_r == 0)
-            except Exception as e:
-                if (now - self.last_error_time) > 2.0:
-                    self.get_logger().warn(f"ESP32 communication timeout: {e}")
-                    self.last_error_time = now
+            self.http_pending = True
+            threading.Thread(target=self._async_send, args=(url, pwm_l, pwm_r, now), daemon=True).start()
 
     def destroy_node(self):
         try:
-            self.session.get(f"{self.drive_endpoint}?l=0&r=0", timeout=0.2)
+            self.session.get(f"{self.drive_endpoint}?l=0&r=0", timeout=0.3)
         except Exception:
             pass
         super().destroy_node()
