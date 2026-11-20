@@ -104,6 +104,14 @@ def start_process(name):
             time.sleep(0.3)
         except Exception:
             pass
+    elif name == "rosbridge":
+        # Free port 9090 from any lingering orphan instances to prevent [Errno 98] Address already in use
+        try:
+            subprocess.run(["pkill", "-9", "-f", "rosbridge_websocket|rosapi_node"], stderr=subprocess.DEVNULL)
+            subprocess.run("fuser -k 9090/tcp", shell=True, stderr=subprocess.DEVNULL)
+            time.sleep(0.5)
+        except Exception:
+            pass
 
     proc = subprocess.Popen(
         ["bash", "-lc", cmd],
