@@ -727,6 +727,12 @@
         if (res) alert("Nav2 stack stopped.");
     });
 
+    document.getElementById("resetSystemBtn")?.addEventListener("click", async () => {
+        if (!confirm("Stop all ROS nodes, kill duplicate processes, and clear DDS shared memory?")) return;
+        const res = await apiPost("/api/cleanup");
+        if (res) alert("System reset complete: all stale nodes killed and Fast DDS SHM cleared.");
+    });
+
     // Autonomous goal dispatch
     document.getElementById("send-goal-btn")?.addEventListener("click", async () => {
         const x = parseFloat(document.getElementById("nav-x").value) || 0.0;

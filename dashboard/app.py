@@ -38,7 +38,8 @@ esp32_config = {
 COMMANDS = {
     "lidar": (
         f"source {ROS_SETUP} && source {WS_SETUP} && "
-        "exec ros2 launch sllidar_ros2 sllidar_c1_launch.py"
+        "exec ros2 launch sllidar_ros2 sllidar_c1_launch.py "
+        "serial_port:=/dev/ttyUSB1"
     ),
     "transform": (
         f"source {ROS_SETUP} && "
@@ -84,6 +85,23 @@ log_handles = {}
 lock = threading.RLock()
 
 
+def detect_lidar_port():
+    """Find the active serial port for the RPLIDAR C1 (CP2102N USB to UART)."""
+    by_id = Path("/dev/serial/by-id")
+    if by_id.exists():
+        for p in by_id.glob("*"):
+            name = p.name.lower()
+            if any(k in name for k in ("cp2102", "silicon_labs", "rplidar", "sllidar", "usb_to_uart")):
+                return str(p)
+    if Path("/dev/ttyUSB1").exists():
+        return "/dev/ttyUSB1"
+    if Path("/dev/ttyUSB0").exists():
+        return "/dev/ttyUSB0"
+    for p in sorted(Path("/dev").glob("ttyUSB*")):
+        return str(p)
+    return "/dev/ttyUSB1"
+
+
 def process_running(name):
     proc = processes.get(name)
     return proc is not None and proc.poll() is None
@@ -96,9 +114,20 @@ def start_process(name):
     # Open in write mode so each run starts with clean logs (avoiding stale errors from past runs)
     log_file = open(LOG_DIR / f"{name}.log", "w", buffering=1)
 
-    # Dynamic command adjustment for bridge with current ESP32 IP
+    # Dynamic command adjustment
     cmd = COMMANDS[name]
-    if name == "bridge":
+    if name == "lidar":
+        try:
+            subprocess.run(["pkill", "-9", "-f", "sllidar_node"], stderr=subprocess.DEVNULL)
+            time.sleep(0.3)
+        except Exception:
+            pass
+        port = detect_lidar_port()
+        cmd = (
+            f"source {ROS_SETUP} && source {WS_SETUP} && "
+            f"exec ros2 launch sllidar_ros2 sllidar_c1_launch.py serial_port:={port}"
+        )
+    elif name == "bridge":
         cmd = f"source {ROS_SETUP} && source {WS_SETUP} && exec python3 {PROJECT}/forklift_bridge/forklift_bridge/cmd_vel_to_esp32.py --ros-args -p esp32_ip:={esp32_config['ip']}"
     elif name == "localization":
         # Clean any orphaned map_server or amcl nodes from previous crashed runs to prevent lifecycle conflicts
@@ -166,6 +195,64 @@ def nav2_status():
         name: process_running(name)
         for name in ("rosbridge", "lidar", "transform", "odometry", "localization", "navigation", "bridge")
     }
+
+
+def nuclear_cleanup():
+    """Kill ALL stale ROS 2 node processes system-wide and clear Fast DDS SHM.
+
+    This prevents duplicate node accumulation (10 RF2O nodes, 6 smoother servers,
+    etc.) that builds up across dashboard restarts when orphaned children escape
+    process group tracking.
+    """
+    patterns = [
+        "sllidar_node",
+        "rf2o_laser_odometry",
+        "static_transform_publisher",
+        "slam_toolbox",
+        "nav2_map_server",
+        "nav2_amcl",
+        "lifecycle_manager",
+        "controller_server",
+        "planner_server",
+        "bt_navigator",
+        "behavior_server",
+        "velocity_smoother",
+        "waypoint_follower",
+        "smoother_server",
+        "rosbridge_websocket",
+        "rosapi_node",
+        "cmd_vel_to_esp32",
+    ]
+    for pattern in patterns:
+        try:
+            subprocess.run(["pkill", "-9", "-f", pattern], stderr=subprocess.DEVNULL)
+        except Exception:
+            pass
+
+    # Free rosbridge port
+    try:
+        subprocess.run("fuser -k 9090/tcp", shell=True, stderr=subprocess.DEVNULL)
+    except Exception:
+        pass
+
+    # Clean stale Fast DDS shared memory segments that cause
+    # "Failed init_port fastrtps_port7003 / open_and_lock_file failed" warnings
+    try:
+        shm_path = Path("/dev/shm")
+        for f in shm_path.glob("fastrtps_*"):
+            try:
+                f.unlink()
+            except Exception:
+                pass
+        for f in shm_path.glob("sem.fastrtps_*"):
+            try:
+                f.unlink()
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    time.sleep(0.8)
 
 
 # ---------------- ESP32 Communication Helpers ----------------
@@ -325,6 +412,13 @@ def mapping_start():
     order = ("rosbridge", "lidar", "transform", "odometry", "slam")
 
     with lock:
+        # Nuke ALL stale ROS nodes before starting to prevent duplicate node accumulation
+        nuclear_cleanup()
+        # Also clear our tracked process table
+        for name in list(processes.keys()):
+            processes.pop(name, None)
+            log_handles.pop(name, None)
+
         try:
             for name in order:
                 start_process(name)
@@ -442,20 +536,12 @@ def nav2_start():
     order = ("rosbridge", "lidar", "transform", "odometry", "localization", "navigation", "bridge")
 
     with lock:
-        if process_running("slam"):
-            stop_process("slam")
-
-        # Hard-kill any stale Nav2 processes left from previous failed runs
-        # to prevent lifecycle nodes being stuck in 'inactive' state
-        try:
-            subprocess.run(
-                ["pkill", "-9", "-f",
-                 "nav2_map_server|nav2_amcl|lifecycle_manager|controller_server|planner_server|bt_navigator|behavior_server|velocity_smoother|waypoint_follower|smoother_server"],
-                stderr=subprocess.DEVNULL
-            )
-            time.sleep(0.5)
-        except Exception:
-            pass
+        # Nuke ALL stale ROS nodes before starting to prevent duplicate node accumulation
+        nuclear_cleanup()
+        # Also clear our tracked process table
+        for name in list(processes.keys()):
+            processes.pop(name, None)
+            log_handles.pop(name, None)
 
         try:
             for name in order:
@@ -480,22 +566,28 @@ def nav2_stop():
     with lock:
         for name in ("bridge", "navigation", "localization"):
             stop_process(name)
-
-        # Also hard-kill any Nav2 zombie processes
-        try:
-            subprocess.run(
-                ["pkill", "-9", "-f",
-                 "nav2_map_server|nav2_amcl|lifecycle_manager|controller_server|planner_server|bt_navigator|behavior_server|velocity_smoother|waypoint_follower|smoother_server"],
-                stderr=subprocess.DEVNULL
-            )
-        except Exception:
-            pass
+        nuclear_cleanup()
+        for name in list(processes.keys()):
+            processes.pop(name, None)
+            log_handles.pop(name, None)
 
         return jsonify(
             success=True,
-            message="Autonomous navigation stack stopped",
+            message="Autonomous navigation stack stopped and all processes cleaned",
             processes=nav2_status(),
         )
+
+
+@app.route("/api/cleanup", methods=["POST"])
+def api_cleanup():
+    """Hard-reset: kill ALL ROS processes, clear SHM, reset process table.
+    Use this from the dashboard when duplicate nodes have accumulated."""
+    with lock:
+        nuclear_cleanup()
+        for name in list(processes.keys()):
+            processes.pop(name, None)
+            log_handles.pop(name, None)
+    return jsonify(success=True, message="All ROS processes killed and Fast DDS SHM cleared")
 
 
 @app.route("/api/navigate", methods=["POST"])
