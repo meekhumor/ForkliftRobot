@@ -35,10 +35,7 @@ def generate_launch_description():
         executable="map_server",
         name="map_server",
         output="screen",
-        parameters=[
-            configured_params,
-            {"yaml_filename": map_file},
-        ],
+        parameters=[configured_params],
         remappings=[("/tf", "tf"), ("/tf_static", "tf_static")],
     )
 
