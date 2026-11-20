@@ -18,7 +18,7 @@ class CmdVelToESP32(Node):
     def __init__(self):
         super().__init__('cmd_vel_to_esp32')
 
-        self.declare_parameter('esp32_ip', '172.19.93.232')
+        self.declare_parameter('esp32_ip', '10.249.26.6')
         self.declare_parameter('esp32_port', 80)
         self.declare_parameter('wheel_separation', 0.20)  # track width in meters
         self.declare_parameter('max_linear_speed', 0.30)  # m/s
