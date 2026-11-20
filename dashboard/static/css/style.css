@@ -549,3 +549,97 @@ footer span {
   color: var(--text);
   font-size: 12px;
 }
+
+/* ==========================================
+   LIVE LOGS TERMINAL VIEWER
+   ========================================== */
+
+.logs-panel {
+  border-color: #4338ca;
+  background: #0d1326;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.log-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  scrollbar-width: thin;
+}
+
+.log-tab {
+  padding: 6px 14px;
+  background: var(--surface-light);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.log-tab:hover {
+  color: var(--text);
+  border-color: #6366f1;
+}
+
+.log-tab.active {
+  background: #4f46e5;
+  border-color: #6366f1;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(79, 70, 229, 0.4);
+}
+
+.log-terminal-container {
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #040812;
+}
+
+.log-terminal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: #090f1d;
+  border-bottom: 1px solid #1e293b;
+  font-size: 11px;
+  color: #818cf8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.log-terminal {
+  margin: 0;
+  padding: 14px;
+  max-height: 340px;
+  min-height: 180px;
+  overflow-y: auto;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #38bdf8;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: #040812;
+}
+
+.log-terminal::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.log-terminal::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}

@@ -29,6 +29,7 @@
         <span id="espStatus">ESP32: Checking...</span>
       </div>
 
+      <button class="button" id="headerLogsBtn" style="min-height: 32px; padding: 6px 12px; font-size: 11px; background: #1e1b4b; border-color: #6366f1; color: #a5b4fc; cursor: pointer;">📋 Logs</button>
       <button class="header-estop" id="quickEstop">E-STOP</button>
     </div>
   </header>
@@ -126,6 +127,44 @@
         <button class="button" id="saveMap">Save Map</button>
         <button class="button" id="startNav2" style="background: #1e3a8a; border-color: #3b82f6;">Start Nav2 Stack</button>
         <button class="button" id="stopNav2">Stop Nav2</button>
+        <button class="button" id="toggleLogsBtn" style="background: #1e1b4b; border-color: #6366f1; color: #a5b4fc;">📋 Show Logs</button>
+      </div>
+    </section>
+
+    <!-- LIVE SYSTEM & MAPPING LOGS CONSOLE (EXPANDABLE) -->
+    <section class="panel logs-panel" id="logsSection" style="display: none; grid-column: 1 / -1;">
+      <div class="panel-heading" style="margin-bottom: 12px;">
+        <div>
+          <h2>Live System & Process Logs</h2>
+          <p>Real-time terminal outputs for LiDAR, TF Transform, Odometry, SLAM & Navigation</p>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <label style="font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 5px; cursor: pointer;">
+            <input type="checkbox" id="autoRefreshLogs" checked> Auto-refresh (2s)
+          </label>
+          <button class="button" id="refreshLogsBtn" style="min-height: 28px; padding: 4px 10px; font-size: 11px;">↻ Refresh</button>
+          <button class="button" id="closeLogsBtn" style="min-height: 28px; padding: 4px 10px; font-size: 11px; background: #dc2626; color: white;">✕ Close</button>
+        </div>
+      </div>
+
+      <!-- LOG SELECTION TABS -->
+      <div class="log-tabs">
+        <button class="log-tab active" data-log="slam">SLAM (slam.log)</button>
+        <button class="log-tab" data-log="lidar">LiDAR (lidar.log)</button>
+        <button class="log-tab" data-log="odometry">Odometry (odometry.log)</button>
+        <button class="log-tab" data-log="transform">TF (transform.log)</button>
+        <button class="log-tab" data-log="navigation">Nav2 (navigation.log)</button>
+        <button class="log-tab" data-log="localization">AMCL (localization.log)</button>
+        <button class="log-tab" data-log="bridge">Bridge (bridge.log)</button>
+      </div>
+
+      <!-- TERMINAL BOX -->
+      <div class="log-terminal-container">
+        <div class="log-terminal-header">
+          <span id="logHeaderTitle">slam.log — Output Terminal</span>
+          <span id="logLinesCount">0 lines</span>
+        </div>
+        <pre class="log-terminal" id="logContent">Loading log output...</pre>
       </div>
     </section>
 

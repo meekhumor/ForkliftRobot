@@ -9,6 +9,7 @@ import time
 import urllib.request
 import urllib.error
 import urllib.parse
+import collections
 from pathlib import Path
 
 from flask import Flask, jsonify, render_template, request
@@ -358,6 +359,48 @@ def map_save():
 
     except subprocess.TimeoutExpired:
         return jsonify(success=False, error="Map save timed out"), 504
+
+
+# ---------------- System Logs Viewer API ----------------
+
+@app.route("/api/logs", methods=["GET"])
+def api_logs():
+    """Retrieve the latest lines of a process log file."""
+    name = request.args.get("name", "slam").strip()
+    lines_count = int(request.args.get("lines", 120))
+    lines_count = min(max(lines_count, 10), 1000)
+
+    # Sanitize process name
+    safe_name = os.path.basename(name).replace("..", "").replace(".log", "")
+    log_file = LOG_DIR / f"{safe_name}.log"
+
+    if not log_file.exists():
+        return jsonify(
+            success=False,
+            name=safe_name,
+            error=f"Log file '{safe_name}.log' not found.",
+            content=f"Log file '{safe_name}.log' does not exist yet. It will be generated when '{safe_name}' is started.",
+            lines=0
+        ), 404
+
+    try:
+        with open(log_file, "r", encoding="utf-8", errors="replace") as f:
+            last_lines = collections.deque(f, maxlen=lines_count)
+        return jsonify(
+            success=True,
+            name=safe_name,
+            content="".join(last_lines),
+            lines=len(last_lines)
+        )
+    except Exception as exc:
+        return jsonify(success=False, name=safe_name, error=str(exc), content=""), 500
+
+
+@app.route("/api/logs/list", methods=["GET"])
+def api_logs_list():
+    """List available log files."""
+    files = sorted([f.stem for f in LOG_DIR.glob("*.log")])
+    return jsonify(success=True, logs=files)
 
 
 # ---------------- Nav2 Autonomous Navigation ----------------

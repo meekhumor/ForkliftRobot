@@ -621,5 +621,103 @@
     pollStatus();
     setInterval(pollStatus, 2500);
 
+    // ---------------------------------------------------------------------------
+    // 7. Live System & Process Logs Viewer
+    // ---------------------------------------------------------------------------
+    const logsSection = document.getElementById("logsSection");
+    const toggleLogsBtn = document.getElementById("toggleLogsBtn");
+    const headerLogsBtn = document.getElementById("headerLogsBtn");
+    const closeLogsBtn = document.getElementById("closeLogsBtn");
+    const refreshLogsBtn = document.getElementById("refreshLogsBtn");
+    const autoRefreshCheckbox = document.getElementById("autoRefreshLogs");
+    const logTabs = document.querySelectorAll(".log-tab");
+    const logContent = document.getElementById("logContent");
+    const logHeaderTitle = document.getElementById("logHeaderTitle");
+    const logLinesCount = document.getElementById("logLinesCount");
+
+    let activeLogName = "slam";
+    let logPollTimer = null;
+
+    function openLogs(targetLog) {
+        if (!logsSection) return;
+        logsSection.style.display = "block";
+        logsSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        if (targetLog) {
+            activeLogName = targetLog;
+            logTabs.forEach(tab => {
+                tab.classList.toggle("active", tab.dataset.log === targetLog);
+            });
+        }
+        fetchCurrentLog();
+        startLogPolling();
+    }
+
+    function closeLogs() {
+        if (!logsSection) return;
+        logsSection.style.display = "none";
+        stopLogPolling();
+    }
+
+    function toggleLogs() {
+        if (!logsSection) return;
+        if (logsSection.style.display === "none" || logsSection.style.display === "") {
+            openLogs();
+        } else {
+            closeLogs();
+        }
+    }
+
+    async function fetchCurrentLog() {
+        if (!logContent) return;
+        try {
+            const res = await fetch(`/api/logs?name=${encodeURIComponent(activeLogName)}&lines=120`);
+            const data = await res.json();
+            if (logHeaderTitle) {
+                logHeaderTitle.textContent = `${activeLogName}.log — Real-time output`;
+            }
+            if (data.success) {
+                logContent.textContent = data.content || "(Log is currently empty)";
+                if (logLinesCount) logLinesCount.textContent = `${data.lines} lines`;
+            } else {
+                logContent.textContent = data.content || data.error || "No log entries found.";
+                if (logLinesCount) logLinesCount.textContent = "0 lines";
+            }
+            // Auto scroll to bottom
+            logContent.scrollTop = logContent.scrollHeight;
+        } catch (err) {
+            logContent.textContent = `Error loading ${activeLogName}.log: ${err.message}`;
+        }
+    }
+
+    function startLogPolling() {
+        stopLogPolling();
+        logPollTimer = setInterval(() => {
+            if (logsSection && logsSection.style.display !== "none" && autoRefreshCheckbox && autoRefreshCheckbox.checked) {
+                fetchCurrentLog();
+            }
+        }, 2000);
+    }
+
+    function stopLogPolling() {
+        if (logPollTimer) {
+            clearInterval(logPollTimer);
+            logPollTimer = null;
+        }
+    }
+
+    toggleLogsBtn?.addEventListener("click", toggleLogs);
+    headerLogsBtn?.addEventListener("click", toggleLogs);
+    closeLogsBtn?.addEventListener("click", closeLogs);
+    refreshLogsBtn?.addEventListener("click", fetchCurrentLog);
+
+    logTabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            logTabs.forEach(t => t.classList.remove("active"));
+            tab.classList.add("active");
+            activeLogName = tab.dataset.log;
+            fetchCurrentLog();
+        });
+    });
+
     console.log("Unified Forklift Robot Control Center script initialized.");
 })();
