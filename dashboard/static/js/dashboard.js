@@ -5,11 +5,10 @@
 
 (() => {
     // ---------------------------------------------------------------------------
-    // 1. ROS 2 WebSocket Connection via rosbridge
+    // 1. ROS 2 WebSocket Connection via rosbridge (with Auto-Reconnect)
     // ---------------------------------------------------------------------------
-    const ros = new ROSLIB.Ros({
-        url: `ws://${window.location.hostname}:9090`
-    });
+    const ros = new ROSLIB.Ros();
+    let isConnecting = false;
 
     const rosDot = document.getElementById("rosDot");
     const connectionStatus = document.getElementById("connectionStatus");
@@ -28,18 +27,37 @@
         if (labelEl) labelEl.textContent = text;
     }
 
+    function connectRos() {
+        if (isConnecting || ros.isConnected) return;
+        isConnecting = true;
+        try {
+            ros.connect(`ws://${window.location.hostname}:9090`);
+        } catch (e) {
+            isConnecting = false;
+        }
+    }
+
     ros.on("connection", () => {
+        isConnecting = false;
         updateDot(rosDot, connectionStatus, "ROS 2: Online", "ok");
     });
 
     ros.on("error", (error) => {
-        console.warn("ROS Bridge connection error:", error);
+        isConnecting = false;
         updateDot(rosDot, connectionStatus, "ROS 2: Error", "err");
     });
 
     ros.on("close", () => {
+        isConnecting = false;
         updateDot(rosDot, connectionStatus, "ROS 2: Disconnected", "err");
+        setTimeout(connectRos, 2500);
     });
+
+    // Start connection and maintain reconnect interval
+    connectRos();
+    setInterval(() => {
+        if (!ros.isConnected) connectRos();
+    }, 4000);
 
     // ---------------------------------------------------------------------------
     // 2. Manual RC Motor & Forklift Controls (Communicating with ESP32 via Jetson)
@@ -551,7 +569,13 @@
         const mapTopic = new ROSLIB.Topic({
             ros: ros,
             name: "/map",
-            messageType: "nav_msgs/msg/OccupancyGrid"
+            messageType: "nav_msgs/msg/OccupancyGrid",
+            qos: {
+                durability: "transient_local",
+                reliability: "reliable",
+                history: "keep_last",
+                depth: 1
+            }
         });
 
         mapTopic.subscribe(message => {

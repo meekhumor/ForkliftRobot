@@ -58,7 +58,9 @@ COMMANDS = {
     ),
     "localization": (
         f"source {ROS_SETUP} && source {WS_SETUP} && "
-        f"exec ros2 launch {PROJECT}/lidar/launch/localization.launch.py"
+        f"exec ros2 launch {PROJECT}/lidar/launch/localization.launch.py "
+        f"map:={PROJECT}/maps/forklift_map.yaml "
+        f"params_file:={PROJECT}/config/navigation/nav2_params.yaml"
     ),
     "navigation": (
         f"source {ROS_SETUP} && source {WS_SETUP} && "
@@ -67,6 +69,10 @@ COMMANDS = {
     "bridge": (
         f"source {ROS_SETUP} && source {WS_SETUP} && "
         f"exec python3 {PROJECT}/forklift_bridge/forklift_bridge/cmd_vel_to_esp32.py --ros-args -p esp32_ip:={esp32_config['ip']}"
+    ),
+    "rosbridge": (
+        f"source {ROS_SETUP} && "
+        "exec ros2 launch rosbridge_server rosbridge_websocket_launch.xml"
     ),
 }
 
@@ -84,12 +90,20 @@ def start_process(name):
     if process_running(name):
         return
 
-    log_file = open(LOG_DIR / f"{name}.log", "a", buffering=1)
+    # Open in write mode so each run starts with clean logs (avoiding stale errors from past runs)
+    log_file = open(LOG_DIR / f"{name}.log", "w", buffering=1)
 
     # Dynamic command adjustment for bridge with current ESP32 IP
     cmd = COMMANDS[name]
     if name == "bridge":
         cmd = f"source {ROS_SETUP} && source {WS_SETUP} && exec python3 {PROJECT}/forklift_bridge/forklift_bridge/cmd_vel_to_esp32.py --ros-args -p esp32_ip:={esp32_config['ip']}"
+    elif name == "localization":
+        # Clean any orphaned map_server or amcl nodes from previous crashed runs to prevent lifecycle conflicts
+        try:
+            subprocess.run(["pkill", "-9", "-f", "nav2_map_server|nav2_amcl|lifecycle_manager_localization"], stderr=subprocess.DEVNULL)
+            time.sleep(0.3)
+        except Exception:
+            pass
 
     proc = subprocess.Popen(
         ["bash", "-lc", cmd],
@@ -132,14 +146,14 @@ def stop_process(name):
 def mapping_status():
     return {
         name: process_running(name)
-        for name in ("lidar", "transform", "odometry", "slam")
+        for name in ("rosbridge", "lidar", "transform", "odometry", "slam")
     }
 
 
 def nav2_status():
     return {
         name: process_running(name)
-        for name in ("lidar", "transform", "odometry", "localization", "navigation", "bridge")
+        for name in ("rosbridge", "lidar", "transform", "odometry", "localization", "navigation", "bridge")
     }
 
 
@@ -227,8 +241,14 @@ def api_config():
 @app.route("/api/status")
 def api_status():
     with lock:
+        if not process_running("rosbridge"):
+            try:
+                start_process("rosbridge")
+            except Exception:
+                pass
         m_state = mapping_status()
         n_state = nav2_status()
+        r_running = process_running("rosbridge")
 
     # Async check ESP32 status
     poll_esp32_status()
@@ -237,9 +257,10 @@ def api_status():
         status="online",
         mapping=m_state["slam"],
         navigating=n_state["navigation"],
+        rosbridge=r_running,
         esp32_online=esp32_config["online"],
         esp32_ip=esp32_config["ip"],
-        processes={**m_state, **n_state},
+        processes={**m_state, **n_state, "rosbridge": r_running},
         telemetry=esp32_config["telemetry"],
     )
 
@@ -290,7 +311,7 @@ def api_estop():
 
 @app.route("/api/mapping/start", methods=["POST"])
 def mapping_start():
-    order = ("lidar", "transform", "odometry", "slam")
+    order = ("rosbridge", "lidar", "transform", "odometry", "slam")
 
     with lock:
         try:
@@ -407,7 +428,7 @@ def api_logs_list():
 
 @app.route("/api/nav2/start", methods=["POST"])
 def nav2_start():
-    order = ("lidar", "transform", "odometry", "localization", "navigation", "bridge")
+    order = ("rosbridge", "lidar", "transform", "odometry", "localization", "navigation", "bridge")
 
     with lock:
         if process_running("slam"):
@@ -538,5 +559,9 @@ def api_initialpose():
 
 
 if __name__ == "__main__":
+    try:
+        start_process("rosbridge")
+    except Exception as exc:
+        print(f"Notice: rosbridge auto-start: {exc}")
     print("Forklift Robot Complete Control Center starting on port 8000...")
     app.run(host="0.0.0.0", port=8000, debug=False)
