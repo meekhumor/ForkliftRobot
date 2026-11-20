@@ -82,3 +82,26 @@
 [WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
 [sllidar_node-1] [INFO] [1794640234.392585266] [sllidar_node]: Stop motor
 [INFO] [sllidar_node-1]: process has finished cleanly [pid 55253]
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-20-14-50-16-456503-vishwa-27477
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [sllidar_node-1]: process started with pid [27655]
+[sllidar_node-1] [INFO] [1795166417.592211949] [sllidar_node]: SLLidar running on ROS2 package SLLidar.ROS2 SDK Version:1.0.1, SLLIDAR SDK Version:2.1.0
+[sllidar_node-1] [INFO] [1795166418.120754129] [sllidar_node]: SLLidar S/N: ABB3FC8DC4E09DCBB7949EF92815547E
+[sllidar_node-1] [INFO] [1795166418.120991573] [sllidar_node]: Firmware Ver: 1.02
+[sllidar_node-1] [INFO] [1795166418.121016053] [sllidar_node]: Hardware Rev: 18
+[sllidar_node-1] [INFO] [1795166418.123981669] [sllidar_node]: SLLidar health status : 0
+[sllidar_node-1] [INFO] [1795166418.124149896] [sllidar_node]: SLLidar health status : OK.
+[sllidar_node-1] [INFO] [1795166418.620614631] [sllidar_node]: current scan mode: Standard, sample rate: 5 Khz, max_distance: 16.0 m, scan frequency:10.0 Hz, 
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-20-15-22-33-044862-vishwa-11120
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [sllidar_node-1]: process started with pid [11197]
+[sllidar_node-1] [INFO] [1795168353.707542637] [sllidar_node]: SLLidar running on ROS2 package SLLidar.ROS2 SDK Version:1.0.1, SLLIDAR SDK Version:2.1.0
+[sllidar_node-1] [INFO] [1795168354.236822591] [sllidar_node]: SLLidar S/N: ABB3FC8DC4E09DCBB7949EF92815547E
+[sllidar_node-1] [INFO] [1795168354.238152964] [sllidar_node]: Firmware Ver: 1.02
+[sllidar_node-1] [INFO] [1795168354.238229670] [sllidar_node]: Hardware Rev: 18
+[sllidar_node-1] [INFO] [1795168354.243924805] [sllidar_node]: SLLidar health status : 0
+[sllidar_node-1] [INFO] [1795168354.244010312] [sllidar_node]: SLLidar health status : OK.
+[sllidar_node-1] [INFO] [1795168354.545659294] [sllidar_node]: current scan mode: Standard, sample rate: 5 Khz, max_distance: 16.0 m, scan frequency:10.0 Hz, 
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[sllidar_node-1] [INFO] [1795169033.536007795] [sllidar_node]: Stop motor
+[INFO] [sllidar_node-1]: process has finished cleanly [pid 11197]
