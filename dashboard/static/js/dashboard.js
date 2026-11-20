@@ -258,11 +258,36 @@
     let latestScanPoints = [];
     let latestMap = null;
     let selectedGoal = null;
+    let selectedInitialPose = null;
+    let mapClickMode = "goal"; // "goal" or "initialpose"
     let mapRenderMetrics = null;
     let cachedOffscreenMap = null;
     let currentRobotPose = null;
     let robotTrail = [];
     let currentNavPath = [];
+
+    const modeGoalBtn = document.getElementById("modeGoalBtn");
+    const modeInitialPoseBtn = document.getElementById("modeInitialPoseBtn");
+
+    modeGoalBtn?.addEventListener("click", () => {
+        mapClickMode = "goal";
+        modeGoalBtn.style.background = "#2563eb";
+        modeGoalBtn.style.color = "white";
+        if (modeInitialPoseBtn) {
+            modeInitialPoseBtn.style.background = "#1e293b";
+            modeInitialPoseBtn.style.color = "#94a3b8";
+        }
+    });
+
+    modeInitialPoseBtn?.addEventListener("click", () => {
+        mapClickMode = "initialpose";
+        modeInitialPoseBtn.style.background = "#059669";
+        modeInitialPoseBtn.style.color = "white";
+        if (modeGoalBtn) {
+            modeGoalBtn.style.background = "#1e293b";
+            modeGoalBtn.style.color = "#94a3b8";
+        }
+    });
 
     if (scanContainer) {
         scanContainer.innerHTML = "";
@@ -449,6 +474,26 @@
                 ctx.fillText("GOAL", gx + 12, gy + 4);
             }
 
+            // 3b. Draw Selected Initial Pose marker if set
+            if (selectedInitialPose) {
+                const initGridX = (selectedInitialPose.x - info.origin.position.x) / info.resolution;
+                const initGridY = (selectedInitialPose.y - info.origin.position.y) / info.resolution;
+                const ix = drawX + initGridX * scale;
+                const iy = drawY + (height - 1 - initGridY) * scale;
+
+                ctx.fillStyle = "#10b981";
+                ctx.beginPath();
+                ctx.arc(ix, iy, 7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = "#ffffff";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = "#a7f3d0";
+                ctx.font = "bold 11px sans-serif";
+                ctx.fillText("ESTIMATE", ix + 10, iy + 4);
+            }
+
             // 4. Draw Live Robot Position, Heading, and Forks
             if (currentRobotPose) {
                 const rGridX = (currentRobotPose.x - info.origin.position.x) / info.resolution;
@@ -495,7 +540,12 @@
             ctx.fillText(`OCCUPANCY MAP | ${width} × ${height} (${info.resolution}m/cell)`, 20, 25);
             ctx.font = "12px sans-serif";
             ctx.fillStyle = "#94a3b8";
-            ctx.fillText("Tap anywhere on the map to set autonomous navigation target", 20, 45);
+            ctx.fillText(
+                mapClickMode === "initialpose"
+                    ? "📍 Mode: Tap anywhere to set ROBOT INITIAL POSE (AMCL Relocalize)"
+                    : "🎯 Mode: Tap anywhere on the map to set AUTONOMOUS GOAL",
+                20, 45
+            );
         }
 
         function refreshDisplay() {
@@ -503,7 +553,7 @@
             else drawScan();
         }
 
-        // Tap/click on map to choose autonomous destination
+        // Tap/click on map to choose autonomous destination or initial pose
         canvas.addEventListener("click", event => {
             if (!mapRenderMetrics || !latestMap) return;
 
@@ -526,17 +576,28 @@
             const worldX = m.info.origin.position.x + gridX * m.info.resolution;
             const worldY = m.info.origin.position.y + gridY * m.info.resolution;
 
-            selectedGoal = { x: worldX, y: worldY };
+            if (mapClickMode === "initialpose") {
+                selectedInitialPose = { x: worldX, y: worldY };
+                const initX = document.getElementById("init-x");
+                const initY = document.getElementById("init-y");
+                const initYaw = document.getElementById("init-yaw");
+                if (initX) initX.value = worldX.toFixed(2);
+                if (initY) initY.value = worldY.toFixed(2);
+                const yaw = parseFloat(initYaw?.value) || 0.0;
+                publishInitialPose(worldX, worldY, yaw);
+            } else {
+                selectedGoal = { x: worldX, y: worldY };
 
-            // Update input fields
-            const navX = document.getElementById("nav-x");
-            const navY = document.getElementById("nav-y");
-            if (navX) navX.value = worldX.toFixed(2);
-            if (navY) navY.value = worldY.toFixed(2);
+                // Update input fields
+                const navX = document.getElementById("nav-x");
+                const navY = document.getElementById("nav-y");
+                if (navX) navX.value = worldX.toFixed(2);
+                if (navY) navY.value = worldY.toFixed(2);
 
-            if (navGoalStatus) {
-                navGoalStatus.textContent = `TARGET: (${worldX.toFixed(1)}, ${worldY.toFixed(1)})`;
-                navGoalStatus.style.color = "#38bdf8";
+                if (navGoalStatus) {
+                    navGoalStatus.textContent = `TARGET: (${worldX.toFixed(1)}, ${worldY.toFixed(1)})`;
+                    navGoalStatus.style.color = "#38bdf8";
+                }
             }
 
             drawOccupancyMap();
@@ -731,6 +792,67 @@
         if (!confirm("Stop all ROS nodes, kill duplicate processes, and clear DDS shared memory?")) return;
         const res = await apiPost("/api/cleanup");
         if (res) alert("System reset complete: all stale nodes killed and Fast DDS SHM cleared.");
+    });
+
+    // Initial pose (2D Pose Estimate) dispatch
+    async function publishInitialPose(x, y, yaw) {
+        const initialPoseStatus = document.getElementById("initialPoseStatus");
+        if (initialPoseStatus) {
+            initialPoseStatus.textContent = `SETTING (${x.toFixed(2)}, ${y.toFixed(2)})...`;
+            initialPoseStatus.style.background = "#854d0e";
+        }
+
+        // 1. Publish directly via ROSLIB if connected
+        try {
+            const qz = Math.sin(yaw / 2.0);
+            const qw = Math.cos(yaw / 2.0);
+            const initialPoseTopic = new ROSLIB.Topic({
+                ros: ros,
+                name: "/initialpose",
+                messageType: "geometry_msgs/msg/PoseWithCovarianceStamped"
+            });
+            const poseMsg = new ROSLIB.Message({
+                header: { frame_id: "map" },
+                pose: {
+                    pose: {
+                        position: { x: x, y: y, z: 0.0 },
+                        orientation: { x: 0.0, y: 0.0, z: qz, w: qw }
+                    },
+                    covariance: [
+                        0.25, 0, 0, 0, 0, 0,
+                        0, 0.25, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0.06
+                    ]
+                }
+            });
+            initialPoseTopic.publish(poseMsg);
+        } catch (e) {
+            console.warn("ROSLIB initialpose publish:", e);
+        }
+
+        // 2. Also publish via backend REST API fallback
+        try {
+            const res = await apiPost("/api/initialpose", { x, y, yaw });
+            if (res && res.success) {
+                if (initialPoseStatus) {
+                    initialPoseStatus.textContent = `POSE: (${x.toFixed(2)}, ${y.toFixed(2)})`;
+                    initialPoseStatus.style.background = "#064e3b";
+                }
+            }
+        } catch (err) {
+            console.error("Initial pose error:", err);
+        }
+    }
+
+    document.getElementById("send-init-pose-btn")?.addEventListener("click", async () => {
+        const x = parseFloat(document.getElementById("init-x").value) || 0.0;
+        const y = parseFloat(document.getElementById("init-y").value) || 0.0;
+        const yaw = parseFloat(document.getElementById("init-yaw").value) || 0.0;
+        await publishInitialPose(x, y, yaw);
+        alert(`Initial robot pose broadcast to AMCL:\nX = ${x.toFixed(2)} m\nY = ${y.toFixed(2)} m\nYaw = ${yaw.toFixed(2)} rad`);
     });
 
     // Autonomous goal dispatch

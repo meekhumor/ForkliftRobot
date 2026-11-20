@@ -113,6 +113,13 @@
         <span class="tag" id="mapStatus">WAITING</span>
       </div>
 
+      <!-- MAP CLICK MODE TOGGLE -->
+      <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items: center; flex-wrap: wrap;">
+        <span style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase; font-weight: bold;">Map Click Action:</span>
+        <button id="modeGoalBtn" class="button" style="padding: 6px 14px; font-size: 12px; background: #2563eb; color: white;">🎯 Set Nav Goal</button>
+        <button id="modeInitialPoseBtn" class="button" style="padding: 6px 14px; font-size: 12px; background: #1e293b; color: #94a3b8;">📍 2D Pose Estimate (Initial Pose)</button>
+      </div>
+
       <div class="visual-area" id="mapView" style="cursor: crosshair;">
         <div class="placeholder">
           <div class="placeholder-icon">⌖</div>
@@ -170,9 +177,40 @@
       </div>
     </section>
 
-    <!-- PANEL 3: AUTONOMOUS NAVIGATION TARGET -->
+    <!-- PANEL 3: ROBOT LOCALIZATION & AUTONOMOUS NAVIGATION GOAL -->
     <section class="panel">
+      <!-- 3A: INITIAL POSE RELOCALIZATION -->
       <div class="panel-heading">
+        <div>
+          <h2>Robot Initial Pose (AMCL Relocalize)</h2>
+          <p>Set where the robot starts on the map, or tap with 2D Estimate mode</p>
+        </div>
+        <span class="tag" id="initialPoseStatus" style="background: #064e3b; color: #6ee7b7;">POSE: (0.00, 0.00)</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px;">
+        <div>
+          <label style="font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 4px;">Initial X (m)</label>
+          <input id="init-x" type="number" step="0.05" value="0.0" style="width: 100%; padding: 10px; border-radius: 8px; background: var(--surface-light); border: 1px solid var(--border); color: var(--text); box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 4px;">Initial Y (m)</label>
+          <input id="init-y" type="number" step="0.05" value="0.0" style="width: 100%; padding: 10px; border-radius: 8px; background: var(--surface-light); border: 1px solid var(--border); color: var(--text); box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 4px;">Initial Yaw (rad)</label>
+          <input id="init-yaw" type="number" step="0.1" value="0.0" style="width: 100%; padding: 10px; border-radius: 8px; background: var(--surface-light); border: 1px solid var(--border); color: var(--text); box-sizing: border-box;">
+        </div>
+      </div>
+
+      <button id="send-init-pose-btn" class="button full" style="min-height: 42px; font-weight: bold; font-size: 13px; background: #065f46; border-color: #059669; color: #a7f3d0; margin-bottom: 16px;">
+        📍 SET INITIAL POSE (RELOCALIZE ROBOT)
+      </button>
+
+      <hr style="border: 0; border-top: 1px solid var(--border); margin: 12px 0 16px 0;">
+
+      <!-- 3B: AUTONOMOUS NAVIGATION GOAL -->
+      <div class="panel-heading" style="margin-bottom: 8px;">
         <div>
           <h2>Autonomous Navigation Goal</h2>
           <p>Tap map above or specify coordinates in map frame</p>
@@ -196,11 +234,11 @@
       </div>
 
       <button id="send-goal-btn" class="button primary full" style="min-height: 48px; font-weight: bold; font-size: 14px;">
-        NAVIGATE TO TARGET POSE
+        🚀 NAVIGATE TO TARGET POSE
       </button>
 
       <button id="cancel-goal-btn" class="button full" style="margin-top: 8px; background: #374151; border-color: #4b5563;">
-        CANCEL NAVIGATION
+        🛑 CANCEL NAVIGATION
       </button>
     </section>
 
