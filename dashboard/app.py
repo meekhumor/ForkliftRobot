@@ -66,7 +66,7 @@ COMMANDS = {
     ),
     "bridge": (
         f"source {ROS_SETUP} && source {WS_SETUP} && "
-        f"exec ros2 run forklift_bridge cmd_vel_to_esp32 --ros-args -p esp32_ip:={esp32_config['ip']}"
+        f"exec python3 {PROJECT}/forklift_bridge/forklift_bridge/cmd_vel_to_esp32.py --ros-args -p esp32_ip:={esp32_config['ip']}"
     ),
 }
 
@@ -89,7 +89,7 @@ def start_process(name):
     # Dynamic command adjustment for bridge with current ESP32 IP
     cmd = COMMANDS[name]
     if name == "bridge":
-        cmd = f"source {ROS_SETUP} && source {WS_SETUP} && exec ros2 run forklift_bridge cmd_vel_to_esp32 --ros-args -p esp32_ip:={esp32_config['ip']}"
+        cmd = f"source {ROS_SETUP} && source {WS_SETUP} && exec python3 {PROJECT}/forklift_bridge/forklift_bridge/cmd_vel_to_esp32.py --ros-args -p esp32_ip:={esp32_config['ip']}"
 
     proc = subprocess.Popen(
         ["bash", "-lc", cmd],

@@ -31,7 +31,10 @@ def generate_launch_description():
         executable="map_server",
         name="map_server",
         output="screen",
-        parameters=[configured_params],
+        parameters=[
+            configured_params,
+            {"yaml_filename": map_file},
+        ],
     )
 
     amcl = Node(
