@@ -241,6 +241,10 @@
     let latestMap = null;
     let selectedGoal = null;
     let mapRenderMetrics = null;
+    let cachedOffscreenMap = null;
+    let currentRobotPose = null;
+    let robotTrail = [];
+    let currentNavPath = [];
 
     if (scanContainer) {
         scanContainer.innerHTML = "";
@@ -302,13 +306,13 @@
             ctx.fillText("LIVE LIDAR SCAN", 20, 30);
         }
 
-        function drawOccupancyMap(map) {
+        function buildOccupancyCache(map) {
             const info = map.info;
             const width = info.width;
             const height = info.height;
             const values = map.data;
 
-            if (!width || !height || values.length !== width * height) return;
+            if (!width || !height || values.length !== width * height) return null;
 
             const offscreen = document.createElement("canvas");
             offscreen.width = width;
@@ -336,6 +340,15 @@
             }
 
             offCtx.putImageData(image, 0, 0);
+            return offscreen;
+        }
+
+        function drawOccupancyMap() {
+            if (!latestMap || !cachedOffscreenMap) return;
+
+            const info = latestMap.info;
+            const width = info.width;
+            const height = info.height;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "#07111f";
@@ -352,24 +365,59 @@
             const drawX = (canvas.width - drawWidth) / 2;
             const drawY = (canvas.height - drawHeight) / 2;
 
-            // Cache metrics for click coordinate conversion
             mapRenderMetrics = { drawX, drawY, drawWidth, drawHeight, scale, width, height, info };
 
             ctx.imageSmoothingEnabled = false;
-            ctx.drawImage(offscreen, drawX, drawY, drawWidth, drawHeight);
+            ctx.drawImage(cachedOffscreenMap, drawX, drawY, drawWidth, drawHeight);
 
             ctx.strokeStyle = "#38bdf8";
             ctx.lineWidth = 1.5;
             ctx.strokeRect(drawX, drawY, drawWidth, drawHeight);
 
-            // Draw user-selected navigation goal pin
-            if (selectedGoal && mapRenderMetrics) {
+            // 1. Draw Nav2 Planned Path
+            if (currentNavPath.length > 1) {
+                ctx.save();
+                ctx.strokeStyle = "#38bdf8";
+                ctx.lineWidth = 3;
+                ctx.setLineDash([6, 4]);
+                ctx.beginPath();
+                currentNavPath.forEach((pt, idx) => {
+                    const gx = (pt.x - info.origin.position.x) / info.resolution;
+                    const gy = (pt.y - info.origin.position.y) / info.resolution;
+                    const px = drawX + gx * scale;
+                    const py = drawY + (height - 1 - gy) * scale;
+                    if (idx === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                });
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // 2. Draw Robot Breadcrumb Trajectory History
+            if (robotTrail.length > 1) {
+                ctx.save();
+                ctx.strokeStyle = "rgba(52, 211, 153, 0.45)";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                robotTrail.forEach((pt, idx) => {
+                    const gx = (pt.x - info.origin.position.x) / info.resolution;
+                    const gy = (pt.y - info.origin.position.y) / info.resolution;
+                    const px = drawX + gx * scale;
+                    const py = drawY + (height - 1 - gy) * scale;
+                    if (idx === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                });
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // 3. Draw User Selected Navigation Goal Pin
+            if (selectedGoal) {
                 const goalGridX = (selectedGoal.x - info.origin.position.x) / info.resolution;
                 const goalGridY = (selectedGoal.y - info.origin.position.y) / info.resolution;
                 const gx = drawX + goalGridX * scale;
                 const gy = drawY + (height - 1 - goalGridY) * scale;
 
-                // Pulsing target pin
                 ctx.fillStyle = "#fb7185";
                 ctx.beginPath();
                 ctx.arc(gx, gy, 8, 0, Math.PI * 2);
@@ -383,6 +431,47 @@
                 ctx.fillText("GOAL", gx + 12, gy + 4);
             }
 
+            // 4. Draw Live Robot Position, Heading, and Forks
+            if (currentRobotPose) {
+                const rGridX = (currentRobotPose.x - info.origin.position.x) / info.resolution;
+                const rGridY = (currentRobotPose.y - info.origin.position.y) / info.resolution;
+                const rx = drawX + rGridX * scale;
+                const ry = drawY + (height - 1 - rGridY) * scale;
+                const yaw = currentRobotPose.yaw;
+
+                ctx.save();
+                ctx.translate(rx, ry);
+                ctx.rotate(-yaw); // Invert yaw because canvas Y is top-down
+
+                // Robot body (green chassis)
+                ctx.fillStyle = "#10b981";
+                ctx.strokeStyle = "#ffffff";
+                ctx.lineWidth = 2;
+                ctx.fillRect(-12, -8, 24, 16);
+                ctx.strokeRect(-12, -8, 24, 16);
+
+                // Front forks (orange tines pointing in +X heading direction)
+                ctx.fillStyle = "#f59e0b";
+                ctx.fillRect(12, -7, 9, 3);
+                ctx.fillRect(12, 4, 9, 3);
+
+                // Heading orientation line
+                ctx.strokeStyle = "#38bdf8";
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(20, 0);
+                ctx.stroke();
+
+                ctx.restore();
+
+                // Robot live coordinate badge
+                ctx.fillStyle = "#34d399";
+                ctx.font = "bold 11px sans-serif";
+                ctx.fillText(`FORKLIFT (${currentRobotPose.x.toFixed(2)}, ${currentRobotPose.y.toFixed(2)})`, rx + 14, ry - 14);
+            }
+
+            // Header titles
             ctx.fillStyle = "#e2e8f0";
             ctx.font = "14px sans-serif";
             ctx.fillText(`OCCUPANCY MAP | ${width} × ${height} (${info.resolution}m/cell)`, 20, 25);
@@ -392,7 +481,7 @@
         }
 
         function refreshDisplay() {
-            if (latestMap) drawOccupancyMap(latestMap);
+            if (latestMap) drawOccupancyMap();
             else drawScan();
         }
 
@@ -432,10 +521,12 @@
                 navGoalStatus.style.color = "#38bdf8";
             }
 
-            drawOccupancyMap(latestMap);
+            drawOccupancyMap();
         });
 
-        // ROS Subscriptions
+        // -----------------------------------------------------------------------
+        // ROS Subscriptions: LiDAR, Map, AMCL Pose, Planned Path, Odometry
+        // -----------------------------------------------------------------------
         const scanTopic = new ROSLIB.Topic({
             ros: ros,
             name: "/scan",
@@ -465,11 +556,81 @@
 
         mapTopic.subscribe(message => {
             latestMap = message;
+            cachedOffscreenMap = buildOccupancyCache(message);
             refreshDisplay();
             if (mapStatus) {
                 mapStatus.textContent = "SLAM MAP LIVE";
                 mapStatus.style.color = "#34d399";
             }
+        });
+
+        // AMCL Robot Pose Subscription (Primary Navigation Localization)
+        const amclPoseTopic = new ROSLIB.Topic({
+            ros: ros,
+            name: "/amcl_pose",
+            messageType: "geometry_msgs/msg/PoseWithCovarianceStamped"
+        });
+
+        amclPoseTopic.subscribe(message => {
+            const pos = message.pose.pose.position;
+            const ori = message.pose.pose.orientation;
+            // Planar yaw from quaternion
+            const yaw = 2 * Math.atan2(ori.z, ori.w);
+
+            currentRobotPose = { x: pos.x, y: pos.y, yaw: yaw };
+
+            // Append to breadcrumb trail if moved > 5cm
+            const lastPt = robotTrail[robotTrail.length - 1];
+            if (!lastPt || Math.hypot(pos.x - lastPt.x, pos.y - lastPt.y) > 0.05) {
+                robotTrail.push({ x: pos.x, y: pos.y });
+                if (robotTrail.length > 200) robotTrail.shift();
+            }
+
+            if (latestMap) drawOccupancyMap();
+        });
+
+        // Odometry Pose Subscription (Fallback during mapping before AMCL)
+        const odomTopic = new ROSLIB.Topic({
+            ros: ros,
+            name: "/odom_rf2o",
+            messageType: "nav_msgs/msg/Odometry"
+        });
+
+        odomTopic.subscribe(message => {
+            // Only use odometry if AMCL is not active
+            if (!currentRobotPose) {
+                const pos = message.pose.pose.position;
+                const ori = message.pose.pose.orientation;
+                const yaw = 2 * Math.atan2(ori.z, ori.w);
+                currentRobotPose = { x: pos.x, y: pos.y, yaw: yaw };
+
+                const lastPt = robotTrail[robotTrail.length - 1];
+                if (!lastPt || Math.hypot(pos.x - lastPt.x, pos.y - lastPt.y) > 0.05) {
+                    robotTrail.push({ x: pos.x, y: pos.y });
+                    if (robotTrail.length > 200) robotTrail.shift();
+                }
+
+                if (latestMap) drawOccupancyMap();
+            }
+        });
+
+        // Nav2 Planned Global Path Subscription
+        const planTopic = new ROSLIB.Topic({
+            ros: ros,
+            name: "/plan",
+            messageType: "nav_msgs/msg/Path"
+        });
+
+        planTopic.subscribe(message => {
+            if (message.poses && message.poses.length > 0) {
+                currentNavPath = message.poses.map(p => ({
+                    x: p.pose.position.x,
+                    y: p.pose.position.y
+                }));
+            } else {
+                currentNavPath = [];
+            }
+            if (latestMap) drawOccupancyMap();
         });
 
         drawScan();

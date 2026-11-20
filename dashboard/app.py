@@ -497,9 +497,44 @@ def api_navigate_cancel():
         f"source {ROS_SETUP} && "
         "ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist '{linear: {x: 0, y: 0, z: 0}, angular: {x: 0, y: 0, z: 0}}'"
     )
-    subprocess.Popen(["bash", "-lc", stop_cmd], start_new_session=True)
-
     return jsonify(success=True, message="Navigation cancelled")
+
+
+@app.route("/api/initialpose", methods=["POST"])
+def api_initialpose():
+    """Publish an initial pose estimate to /initialpose for AMCL relocalization."""
+    try:
+        data = request.get_json() or {}
+        x = float(data.get("x", 0.0))
+        y = float(data.get("y", 0.0))
+        yaw = float(data.get("yaw", 0.0))
+
+        qz = math.sin(yaw / 2.0)
+        qw = math.cos(yaw / 2.0)
+
+        msg = {
+            "header": {"frame_id": "map"},
+            "pose": {
+                "pose": {
+                    "position": {"x": x, "y": y, "z": 0.0},
+                    "orientation": {"x": 0.0, "y": 0.0, "z": qz, "w": qw}
+                },
+                "covariance": [
+                    0.25, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.25, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.06
+                ]
+            }
+        }
+        yaml_arg = shlex.quote(json.dumps(msg))
+        cmd = f"source {ROS_SETUP} && ros2 topic pub --once /initialpose geometry_msgs/msg/PoseWithCovarianceStamped {yaml_arg}"
+        subprocess.Popen(["bash", "-lc", cmd], start_new_session=True)
+        return jsonify(success=True, message=f"Initial pose broadcast to X: {x:.2f}, Y: {y:.2f}")
+    except Exception as exc:
+        return jsonify(success=False, error=str(exc)), 500
 
 
 if __name__ == "__main__":
