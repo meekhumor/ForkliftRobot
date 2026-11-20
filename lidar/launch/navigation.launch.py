@@ -104,6 +104,8 @@ def generate_launch_description():
         parameters=[
             {"autostart": autostart},
             {"node_names": lifecycle_nodes},
+            {"bond_timeout": 8.0},
+            {"attempt_respawn_reconnection": True},
         ],
     )
 

@@ -66,9 +66,9 @@ COMMANDS = {
     ),
     "navigation": (
         f"source {ROS_SETUP} && source {WS_SETUP} && "
-        f"exec ros2 launch nav2_bringup navigation_launch.py "
+        f"exec ros2 launch {PROJECT}/lidar/launch/navigation.launch.py "
         f"params_file:={PROJECT}/config/navigation/nav2_params.yaml "
-        "use_sim_time:=false"
+        "autostart:=true"
     ),
     "bridge": (
         f"source {ROS_SETUP} && source {WS_SETUP} && "
