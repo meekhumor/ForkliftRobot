@@ -1,0 +1,84 @@
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-12-19-05-28-612600-vishwa-61706
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [sllidar_node-1]: process started with pid [61772]
+[sllidar_node-1] [INFO] [1794490529.297145290] [sllidar_node]: SLLidar running on ROS2 package SLLidar.ROS2 SDK Version:1.0.1, SLLIDAR SDK Version:2.1.0
+[sllidar_node-1] [INFO] [1794490529.820476936] [sllidar_node]: SLLidar S/N: ABB3FC8DC4E09DCBB7949EF92815547E
+[sllidar_node-1] [INFO] [1794490529.820671981] [sllidar_node]: Firmware Ver: 1.02
+[sllidar_node-1] [INFO] [1794490529.820697965] [sllidar_node]: Hardware Rev: 18
+[sllidar_node-1] [INFO] [1794490529.823271115] [sllidar_node]: SLLidar health status : 0
+[sllidar_node-1] [INFO] [1794490529.823328940] [sllidar_node]: SLLidar health status : OK.
+[sllidar_node-1] [INFO] [1794490530.119508070] [sllidar_node]: current scan mode: Standard, sample rate: 5 Khz, max_distance: 16.0 m, scan frequency:10.0 Hz, 
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[sllidar_node-1] [INFO] [1794490613.371900201] [sllidar_node]: Stop motor
+[INFO] [sllidar_node-1]: process has finished cleanly [pid 61772]
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-12-19-07-44-792950-vishwa-63106
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [sllidar_node-1]: process started with pid [63153]
+[sllidar_node-1] [INFO] [1794490665.054300738] [sllidar_node]: SLLidar running on ROS2 package SLLidar.ROS2 SDK Version:1.0.1, SLLIDAR SDK Version:2.1.0
+[sllidar_node-1] [INFO] [1794490665.572650537] [sllidar_node]: SLLidar S/N: ABB3FC8DC4E09DCBB7949EF92815547E
+[sllidar_node-1] [INFO] [1794490665.572881230] [sllidar_node]: Firmware Ver: 1.02
+[sllidar_node-1] [INFO] [1794490665.572918927] [sllidar_node]: Hardware Rev: 18
+[sllidar_node-1] [INFO] [1794490665.575617200] [sllidar_node]: SLLidar health status : 0
+[sllidar_node-1] [INFO] [1794490665.575753779] [sllidar_node]: SLLidar health status : OK.
+[sllidar_node-1] [INFO] [1794490665.855599365] [sllidar_node]: current scan mode: Standard, sample rate: 5 Khz, max_distance: 16.0 m, scan frequency:10.0 Hz, 
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[sllidar_node-1] [INFO] [1794490688.063569762] [sllidar_node]: Stop motor
+[INFO] [sllidar_node-1]: process has finished cleanly [pid 63153]
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-12-19-11-58-499139-vishwa-64305
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [sllidar_node-1]: process started with pid [64367]
+[sllidar_node-1] [INFO] [1794490918.759830175] [sllidar_node]: SLLidar running on ROS2 package SLLidar.ROS2 SDK Version:1.0.1, SLLIDAR SDK Version:2.1.0
+[sllidar_node-1] [INFO] [1794490919.278104516] [sllidar_node]: SLLidar S/N: ABB3FC8DC4E09DCBB7949EF92815547E
+[sllidar_node-1] [INFO] [1794490919.278322185] [sllidar_node]: Firmware Ver: 1.02
+[sllidar_node-1] [INFO] [1794490919.278344489] [sllidar_node]: Hardware Rev: 18
+[sllidar_node-1] [INFO] [1794490919.281008201] [sllidar_node]: SLLidar health status : 0
+[sllidar_node-1] [INFO] [1794490919.281106955] [sllidar_node]: SLLidar health status : OK.
+[sllidar_node-1] [INFO] [1794490919.563602206] [sllidar_node]: current scan mode: Standard, sample rate: 5 Khz, max_distance: 16.0 m, scan frequency:10.0 Hz, 
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[sllidar_node-1] [INFO] [1794490953.213928420] [sllidar_node]: Stop motor
+[INFO] [sllidar_node-1]: process has finished cleanly [pid 64367]
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-12-19-24-06-260655-vishwa-68152
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [sllidar_node-1]: process started with pid [68193]
+[sllidar_node-1] [INFO] [1794491646.524980932] [sllidar_node]: SLLidar running on ROS2 package SLLidar.ROS2 SDK Version:1.0.1, SLLIDAR SDK Version:2.1.0
+[sllidar_node-1] [INFO] [1794491647.047932857] [sllidar_node]: SLLidar S/N: ABB3FC8DC4E09DCBB7949EF92815547E
+[sllidar_node-1] [INFO] [1794491647.048188575] [sllidar_node]: Firmware Ver: 1.02
+[sllidar_node-1] [INFO] [1794491647.048221056] [sllidar_node]: Hardware Rev: 18
+[sllidar_node-1] [INFO] [1794491647.050883616] [sllidar_node]: SLLidar health status : 0
+[sllidar_node-1] [INFO] [1794491647.050965794] [sllidar_node]: SLLidar health status : OK.
+[sllidar_node-1] [INFO] [1794491647.332004721] [sllidar_node]: current scan mode: Standard, sample rate: 5 Khz, max_distance: 16.0 m, scan frequency:10.0 Hz, 
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[sllidar_node-1] [INFO] [1794491880.720116796] [sllidar_node]: Stop motor
+[INFO] [sllidar_node-1]: process has finished cleanly [pid 68193]
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-14-11-58-52-722669-vishwa-37391
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [sllidar_node-1]: process started with pid [37466]
+[sllidar_node-1] [INFO] [1794637733.401053281] [sllidar_node]: SLLidar running on ROS2 package SLLidar.ROS2 SDK Version:1.0.1, SLLIDAR SDK Version:2.1.0
+[sllidar_node-1] [ERROR] [1794637733.401606895] [sllidar_node]: Error, unexpected error, code: 80008004
+[ERROR] [sllidar_node-1]: process has died [pid 37466, exit code 255, cmd '/home/vishwa/ros2_ws/install/sllidar_ros2/lib/sllidar_ros2/sllidar_node --ros-args -r __node:=sllidar_node --params-file /tmp/launch_params_i4ifk6k5'].
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-14-12-13-32-385735-vishwa-45493
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [sllidar_node-1]: process started with pid [45531]
+[sllidar_node-1] [INFO] [1794638612.850013001] [sllidar_node]: SLLidar running on ROS2 package SLLidar.ROS2 SDK Version:1.0.1, SLLIDAR SDK Version:2.1.0
+[sllidar_node-1] [INFO] [1794638613.374577456] [sllidar_node]: SLLidar S/N: ABB3FC8DC4E09DCBB7949EF92815547E
+[sllidar_node-1] [INFO] [1794638613.374887191] [sllidar_node]: Firmware Ver: 1.02
+[sllidar_node-1] [INFO] [1794638613.374920504] [sllidar_node]: Hardware Rev: 18
+[sllidar_node-1] [INFO] [1794638613.377590326] [sllidar_node]: SLLidar health status : 0
+[sllidar_node-1] [INFO] [1794638613.377736314] [sllidar_node]: SLLidar health status : OK.
+[sllidar_node-1] [INFO] [1794638613.689636194] [sllidar_node]: current scan mode: Standard, sample rate: 5 Khz, max_distance: 16.0 m, scan frequency:10.0 Hz, 
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[sllidar_node-1] [INFO] [1794638818.599191206] [sllidar_node]: Stop motor
+[INFO] [sllidar_node-1]: process has finished cleanly [pid 45531]
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-14-12-33-03-018951-vishwa-55197
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [sllidar_node-1]: process started with pid [55253]
+[sllidar_node-1] [INFO] [1794639783.282091715] [sllidar_node]: SLLidar running on ROS2 package SLLidar.ROS2 SDK Version:1.0.1, SLLIDAR SDK Version:2.1.0
+[sllidar_node-1] [INFO] [1794639783.805043648] [sllidar_node]: SLLidar S/N: ABB3FC8DC4E09DCBB7949EF92815547E
+[sllidar_node-1] [INFO] [1794639783.805273477] [sllidar_node]: Firmware Ver: 1.02
+[sllidar_node-1] [INFO] [1794639783.805350311] [sllidar_node]: Hardware Rev: 18
+[sllidar_node-1] [INFO] [1794639783.808009764] [sllidar_node]: SLLidar health status : 0
+[sllidar_node-1] [INFO] [1794639783.808069029] [sllidar_node]: SLLidar health status : OK.
+[sllidar_node-1] [INFO] [1794639784.089798751] [sllidar_node]: current scan mode: Standard, sample rate: 5 Khz, max_distance: 16.0 m, scan frequency:10.0 Hz, 
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[sllidar_node-1] [INFO] [1794640234.392585266] [sllidar_node]: Stop motor
+[INFO] [sllidar_node-1]: process has finished cleanly [pid 55253]

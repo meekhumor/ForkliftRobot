@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1120">
+  <title>Forklift Robot | Control Center</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">F</div>
+      <div>
+        <h1>FORKLIFT ROBOT</h1>
+        <p>AUTONOMOUS CONTROL CENTER</p>
+      </div>
+    </div>
+
+    <div class="connection">
+      <span class="status-dot"></span>
+      <span id="connectionStatus">Connecting...</span>
+    </div>
+  </header>
+
+  <main class="dashboard">
+
+    <!-- LIVE LIDAR MAP -->
+    <section class="panel map-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Live LiDAR Map</h2>
+          <p>Environment scanning and robot position</p>
+        </div>
+        <span class="tag" id="mapStatus">WAITING</span>
+      </div>
+
+      <div class="visual-area" id="mapView">
+        <div class="placeholder">
+          <div class="placeholder-icon">⌖</div>
+          <h3>LiDAR Map</h3>
+          <p>Waiting for ROS data</p>
+        </div>
+      </div>
+
+      <div class="panel-actions">
+        <button class="button primary" id="startMapping">Start Mapping</button>
+        <button class="button" id="stopMapping">Stop Mapping</button>
+        <button class="button" id="saveMap">Save Map</button>
+      </div>
+    </section>
+
+    <!-- STEREO CAMERA -->
+    <section class="panel camera-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Live Stereo Camera</h2>
+          <p>ArUco detection and depth estimation</p>
+        </div>
+        <span class="tag">STEREO</span>
+      </div>
+
+      <div class="visual-area camera-view">
+        <img id="cameraFeed" alt="Live robot camera feed">
+
+        <div class="camera-placeholder" id="cameraPlaceholder">
+          <div class="placeholder-icon">◉</div>
+          <h3>Camera Feed</h3>
+          <p>Waiting for camera stream</p>
+        </div>
+      </div>
+
+      <div class="camera-info">
+        <div>
+          <span>Marker ID</span>
+          <strong id="markerId">--</strong>
+        </div>
+        <div>
+          <span>Distance</span>
+          <strong id="markerDistance">-- cm</strong>
+        </div>
+        <div>
+          <span>Detection</span>
+          <strong id="detectionStatus">Waiting</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- NAVIGATION -->
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Navigation</h2>
+          <p>Choose source and delivery destination</p>
+        </div>
+      </div>
+
+      <div class="form-area">
+        <label for="source">Source</label>
+        <select id="source">
+          <option value="">Select source</option>
+        </select>
+
+        <label for="destination">Destination</label>
+        <select id="destination">
+          <option value="">Select destination</option>
+        </select>
+
+        <button class="button primary full" id="startNavigation">
+          Start Navigation
+        </button>
+
+        <button class="button full" id="cancelNavigation">
+          Cancel Navigation
+        </button>
+      </div>
+    </section>
+
+    <!-- MANUAL COORDINATE NAVIGATION TARGET PANEL -->
+    <section class="panel">
+      <div class="heading" style="margin-bottom: 12px; font-size: 0.85rem; font-weight: bold; color: var(--muted, #aab5c4); text-transform: uppercase; letter-spacing: 0.05em;">Autonomous Navigation Target</div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px;">
+        <div>
+          <label style="font-size: 0.75rem; color: var(--muted, #aab5c4); display: block; margin-bottom: 4px;">X (meters)</label>
+          <input id="nav-x" type="number" step="0.1" value="0.0" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--button, #293548); border: 1px solid #293344; color: var(--text, #f4f7fb); box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="font-size: 0.75rem; color: var(--muted, #aab5c4); display: block; margin-bottom: 4px;">Y (meters)</label>
+          <input id="nav-y" type="number" step="0.1" value="0.0" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--button, #293548); border: 1px solid #293344; color: var(--text, #f4f7fb); box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="font-size: 0.75rem; color: var(--muted, #aab5c4); display: block; margin-bottom: 4px;">Yaw (radians)</label>
+          <input id="nav-yaw" type="number" step="0.1" value="0.0" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--button, #293548); border: 1px solid #293344; color: var(--text, #f4f7fb); box-sizing: border-box;">
+        </div>
+      </div>
+      <button id="send-goal-btn" class="button primary full" style="width: 100%; min-height: 48px; background: var(--accent, #38a7ff); color: #071522; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;">SEND NAVIGATION GOAL</button>
+    </section>
+
+    <!-- DETECTED BOXES -->
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Detected Boxes</h2>
+          <p>ArUco marker identification</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Marker ID</th>
+              <th>Distance</th>
+              <th>Destination</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody id="boxTable">
+            <tr>
+              <td colspan="4" class="empty">No boxes detected</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ROBOT STATUS -->
+    <section class="panel status-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Robot Status</h2>
+          <p>System and sensor overview</p>
+        </div>
+      </div>
+
+      <div class="status-grid">
+        <div class="status-item">
+          <span>LiDAR</span>
+          <strong id="lidarStatus">--</strong>
+        </div>
+
+        <div class="status-item">
+          <span>Camera</span>
+          <strong id="cameraStatus">--</strong>
+        </div>
+
+        <div class="status-item">
+          <span>ROS 2</span>
+          <strong id="rosStatus">--</strong>
+        </div>
+
+        <div class="status-item">
+          <span>Motors</span>
+          <strong id="motorStatus">Not connected</strong>
+        </div>
+
+        <div class="status-item">
+          <span>Robot Mode</span>
+          <strong id="robotMode">Idle</strong>
+        </div>
+
+        <div class="status-item">
+          <span>Battery</span>
+          <strong id="batteryStatus">--</strong>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    FORKLIFT ROBOT CONTROL CENTER
+    <span>•</span>
+    LOCAL NETWORK
+  </footer>
+
+  <!-- ROS communication library -->
+  <script src="https://cdn.jsdelivr.net/npm/roslib/build/roslib.min.js"></script>
+
+  <!-- Dashboard controller script -->
+  <script src="/static/js/dashboard.js"></script>
+
+  <!-- Navigation Goal Dispatch Handler Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sendGoalBtn = document.getElementById('send-goal-btn');
+      if (sendGoalBtn) {
+        sendGoalBtn.addEventListener('click', () => {
+          const x = parseFloat(document.getElementById('nav-x').value) || 0.0;
+          const y = parseFloat(document.getElementById('nav-y').value) || 0.0;
+          const yaw = parseFloat(document.getElementById('nav-yaw').value) || 0.0;
+
+          fetch('/api/navigate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ x: x, y: y, yaw: yaw })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              console.log("Goal dispatched successfully:", data.message);
+              alert("Navigation goal sent successfully!");
+            } else {
+              console.error("Failed to dispatch goal:", data.error);
+              alert("Failed to send goal: " + data.error);
+            }
+          })
+          .catch(err => {
+            console.error("Network error:", err);
+            alert("Network error while sending navigation goal.");
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>

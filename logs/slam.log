@@ -1,0 +1,94 @@
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-12-19-05-34-234350-vishwa-61847
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [async_slam_toolbox_node-1]: process started with pid [61910]
+[async_slam_toolbox_node-1] [INFO] [1794490535.472496677] [slam_toolbox]: Node using stack size 40000000
+[async_slam_toolbox_node-1] [INFO] [1794490535.926761387] [slam_toolbox]: Configuring
+[async_slam_toolbox_node-1] [INFO] [1794490536.128723699] [slam_toolbox]: Using solver plugin solver_plugins::CeresSolver
+[async_slam_toolbox_node-1] [INFO] [1794490536.129779373] [slam_toolbox]: CeresSolver: Using SCHUR_JACOBI preconditioner.
+[INFO] [launch.user]: [LifecycleLaunch] Slamtoolbox node is activating.
+[async_slam_toolbox_node-1] [INFO] [1794490536.226309558] [slam_toolbox]: Activating
+[async_slam_toolbox_node-1] Registering sensor: [Custom Described Lidar]
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[async_slam_toolbox_node-1] [INFO] [1794490609.828602805] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [async_slam_toolbox_node-1]: process has finished cleanly [pid 61910]
+[async_slam_toolbox_node-1] Unregistering sensor: Custom Described Lidar
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-12-19-07-50-801648-vishwa-63222
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [async_slam_toolbox_node-1]: process started with pid [63285]
+[async_slam_toolbox_node-1] [INFO] [1794490672.040382210] [slam_toolbox]: Node using stack size 40000000
+[async_slam_toolbox_node-1] [INFO] [1794490672.367858090] [slam_toolbox]: Configuring
+[async_slam_toolbox_node-1] [INFO] [1794490672.383407038] [slam_toolbox]: Using solver plugin solver_plugins::CeresSolver
+[async_slam_toolbox_node-1] [INFO] [1794490672.384170417] [slam_toolbox]: CeresSolver: Using SCHUR_JACOBI preconditioner.
+[INFO] [launch.user]: [LifecycleLaunch] Slamtoolbox node is activating.
+[async_slam_toolbox_node-1] [INFO] [1794490672.430782286] [slam_toolbox]: Activating
+[async_slam_toolbox_node-1] Registering sensor: [Custom Described Lidar]
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[async_slam_toolbox_node-1] [INFO] [1794490684.969742274] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [async_slam_toolbox_node-1]: process has finished cleanly [pid 63285]
+[async_slam_toolbox_node-1] Unregistering sensor: Custom Described Lidar
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-12-19-12-04-647619-vishwa-64459
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [async_slam_toolbox_node-1]: process started with pid [64543]
+[async_slam_toolbox_node-1] [INFO] [1794490925.749975648] [slam_toolbox]: Node using stack size 40000000
+[async_slam_toolbox_node-1] [INFO] [1794490926.857494510] [slam_toolbox]: Configuring
+[async_slam_toolbox_node-1] [INFO] [1794490926.872411347] [slam_toolbox]: Using solver plugin solver_plugins::CeresSolver
+[async_slam_toolbox_node-1] [INFO] [1794490926.873191942] [slam_toolbox]: CeresSolver: Using SCHUR_JACOBI preconditioner.
+[INFO] [launch.user]: [LifecycleLaunch] Slamtoolbox node is activating.
+[async_slam_toolbox_node-1] [INFO] [1794490926.924641399] [slam_toolbox]: Activating
+[async_slam_toolbox_node-1] Registering sensor: [Custom Described Lidar]
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[async_slam_toolbox_node-1] [INFO] [1794490951.284864238] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [async_slam_toolbox_node-1]: process has finished cleanly [pid 64543]
+[async_slam_toolbox_node-1] Unregistering sensor: Custom Described Lidar
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-12-19-24-12-355219-vishwa-68287
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [async_slam_toolbox_node-1]: process started with pid [68353]
+[async_slam_toolbox_node-1] [INFO] [1794491653.201110783] [slam_toolbox]: Node using stack size 40000000
+[async_slam_toolbox_node-1] [INFO] [1794491653.462358932] [slam_toolbox]: Configuring
+[async_slam_toolbox_node-1] [INFO] [1794491653.547172933] [slam_toolbox]: Using solver plugin solver_plugins::CeresSolver
+[async_slam_toolbox_node-1] [INFO] [1794491653.547881174] [slam_toolbox]: CeresSolver: Using SCHUR_JACOBI preconditioner.
+[INFO] [launch.user]: [LifecycleLaunch] Slamtoolbox node is activating.
+[async_slam_toolbox_node-1] [INFO] [1794491653.910301827] [slam_toolbox]: Activating
+[async_slam_toolbox_node-1] [INFO] [1794491654.041423818] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1794491653.840 for reason 'discarding message because the queue is full'
+[async_slam_toolbox_node-1] Registering sensor: [Custom Described Lidar]
+[async_slam_toolbox_node-1] [INFO] [1794491714.985686216] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1794491714.787 for reason 'discarding message because the queue is full'
+[async_slam_toolbox_node-1] [INFO] [1794491719.179555043] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1794491718.981 for reason 'discarding message because the queue is full'
+[async_slam_toolbox_node-1] [INFO] [1794491867.840882703] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1794491867.632 for reason 'discarding message because the queue is full'
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[async_slam_toolbox_node-1] [INFO] [1794491878.947944726] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [async_slam_toolbox_node-1]: process has finished cleanly [pid 68353]
+[async_slam_toolbox_node-1] Unregistering sensor: Custom Described Lidar
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-14-11-58-58-626423-vishwa-37596
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [async_slam_toolbox_node-1]: process started with pid [37689]
+[async_slam_toolbox_node-1] [INFO] [1794637739.921870106] [slam_toolbox]: Node using stack size 40000000
+[async_slam_toolbox_node-1] [INFO] [1794637740.062713925] [slam_toolbox]: Configuring
+[async_slam_toolbox_node-1] [INFO] [1794637740.283458351] [slam_toolbox]: Using solver plugin solver_plugins::CeresSolver
+[async_slam_toolbox_node-1] [INFO] [1794637740.284802259] [slam_toolbox]: CeresSolver: Using SCHUR_JACOBI preconditioner.
+[INFO] [launch.user]: [LifecycleLaunch] Slamtoolbox node is activating.
+[async_slam_toolbox_node-1] [INFO] [1794637740.377371458] [slam_toolbox]: Activating
+[async_slam_toolbox_node-1] [INFO] [1794638615.992613824] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1794638615.693 for reason 'discarding message because the queue is full'
+[async_slam_toolbox_node-1] Registering sensor: [Custom Described Lidar]
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[async_slam_toolbox_node-1] [INFO] [1794638814.766042121] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [async_slam_toolbox_node-1]: process has finished cleanly [pid 37689]
+[async_slam_toolbox_node-1] Unregistering sensor: Custom Described Lidar
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-14-12-33-08-994673-vishwa-55371
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [async_slam_toolbox_node-1]: process started with pid [55432]
+[async_slam_toolbox_node-1] [INFO] [1794639790.017975569] [slam_toolbox]: Node using stack size 40000000
+[async_slam_toolbox_node-1] [INFO] [1794639790.129038474] [slam_toolbox]: Configuring
+[async_slam_toolbox_node-1] [INFO] [1794639790.144966131] [slam_toolbox]: Using solver plugin solver_plugins::CeresSolver
+[async_slam_toolbox_node-1] [INFO] [1794639790.145956810] [slam_toolbox]: CeresSolver: Using SCHUR_JACOBI preconditioner.
+[INFO] [launch.user]: [LifecycleLaunch] Slamtoolbox node is activating.
+[async_slam_toolbox_node-1] [INFO] [1794639790.548148018] [slam_toolbox]: Activating
+[async_slam_toolbox_node-1] Registering sensor: [Custom Described Lidar]
+[async_slam_toolbox_node-1] [INFO] [1794640009.909242736] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1794640009.712 for reason 'discarding message because the queue is full'
+[async_slam_toolbox_node-1] WARNING: Logging before InitGoogleLogging() is written to STDERR
+[async_slam_toolbox_node-1] W20261114 12:37:36.086213 55466 preprocessor.cc:67] Specified options.num_threads: 50 exceeds maximum available from the threading model Ceres was compiled with: 6.  Bounding to maximum number available.
+[async_slam_toolbox_node-1] [INFO] [1794640068.456410033] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1794640068.255 for reason 'discarding message because the queue is full'
+[async_slam_toolbox_node-1] [INFO] [1794640164.353865628] [slam_toolbox]: Message Filter dropping message: frame 'laser' at time 1794640164.159 for reason 'discarding message because the queue is full'
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[async_slam_toolbox_node-1] [INFO] [1794640230.422297173] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [async_slam_toolbox_node-1]: process has finished cleanly [pid 55432]
+[async_slam_toolbox_node-1] Unregistering sensor: Custom Described Lidar
