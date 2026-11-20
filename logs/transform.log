@@ -1,47 +1,5 @@
-[WARN] [1794490529.547858147] []: Old-style arguments are deprecated; see --help for new-style arguments
-[INFO] [1794490529.630542304] [static_transform_publisher_kut63v1ZWHlJ44vU]: Spinning until stopped - publishing transform
+[WARN] [1795182460.378418855] []: Old-style arguments are deprecated; see --help for new-style arguments
+[INFO] [1795182460.711941228] [static_transform_publisher_NY6T1x4IA6sZa9cO]: Spinning until stopped - publishing transform
 translation: ('0.000000', '0.000000', '0.000000')
 rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
 from 'base_link' to 'laser'
-[INFO] [1794490612.871157641] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[WARN] [1794490665.958958226] []: Old-style arguments are deprecated; see --help for new-style arguments
-[INFO] [1794490666.002610505] [static_transform_publisher_XRGjfiWn7Pc53CXP]: Spinning until stopped - publishing transform
-translation: ('0.000000', '0.000000', '0.000000')
-rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-from 'base_link' to 'laser'
-[INFO] [1794490687.557372863] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[WARN] [1794490919.762955847] []: Old-style arguments are deprecated; see --help for new-style arguments
-[INFO] [1794490919.800302406] [static_transform_publisher_muoXJIG5ltELffHn]: Spinning until stopped - publishing transform
-translation: ('0.000000', '0.000000', '0.000000')
-rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-from 'base_link' to 'laser'
-[INFO] [1794490952.768702230] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[WARN] [1794491647.460672252] []: Old-style arguments are deprecated; see --help for new-style arguments
-[INFO] [1794491647.503604513] [static_transform_publisher_F6vAnL5YmzUVpNT1]: Spinning until stopped - publishing transform
-translation: ('0.000000', '0.000000', '0.000000')
-rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-from 'base_link' to 'laser'
-[INFO] [1794491880.234292993] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[WARN] [1794637733.924473479] []: Old-style arguments are deprecated; see --help for new-style arguments
-[INFO] [1794637733.989393662] [static_transform_publisher_5EsnozDSo0NpGmdT]: Spinning until stopped - publishing transform
-translation: ('0.000000', '0.000000', '0.000000')
-rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-from 'base_link' to 'laser'
-[INFO] [1794638816.460319644] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[WARN] [1794639784.095054902] []: Old-style arguments are deprecated; see --help for new-style arguments
-[INFO] [1794639784.136059865] [static_transform_publisher_qysyD7sXbm1uN1Mb]: Spinning until stopped - publishing transform
-translation: ('0.000000', '0.000000', '0.000000')
-rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-from 'base_link' to 'laser'
-[INFO] [1794640233.866911020] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[WARN] [1795166416.504540248] []: Old-style arguments are deprecated; see --help for new-style arguments
-[INFO] [1795166417.094499129] [static_transform_publisher_vkJMQuJ12goryN80]: Spinning until stopped - publishing transform
-translation: ('0.000000', '0.000000', '0.000000')
-rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-from 'base_link' to 'laser'
-[WARN] [1795168353.498389044] []: Old-style arguments are deprecated; see --help for new-style arguments
-[INFO] [1795168353.684207296] [static_transform_publisher_aRagN3YG5GUIHy1L]: Spinning until stopped - publishing transform
-translation: ('0.000000', '0.000000', '0.000000')
-rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
-from 'base_link' to 'laser'
-[INFO] [1795169032.947319472] [rclcpp]: signal_handler(SIGINT/SIGTERM)

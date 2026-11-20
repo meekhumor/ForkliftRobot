@@ -1,0 +1,21 @@
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-20-20-10-46-844341-vishwa-252254
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [rosbridge_websocket-1]: process started with pid [252289]
+[INFO] [rosapi_node-2]: process started with pid [252290]
+[rosbridge_websocket-1] [INFO] [1795185649.376184566] [rosbridge_websocket]: Rosbridge WebSocket server started on port 9090
+[rosbridge_websocket-1] [INFO] [1795185649.791418976] [rosbridge_websocket]: Calling services in new thread
+[rosbridge_websocket-1] [INFO] [1795185649.792451104] [rosbridge_websocket]: Sending action goals in new thread
+[rosbridge_websocket-1] [INFO] [1795185649.794694118] [rosbridge_websocket]: Client connected. 1 clients total.
+[rosbridge_websocket-1] [INFO] [1795185649.825530722] [rosbridge_websocket]: Calling services in new thread
+[rosbridge_websocket-1] [INFO] [1795185649.829764901] [rosbridge_websocket]: Sending action goals in new thread
+[rosbridge_websocket-1] [INFO] [1795185649.837639385] [rosbridge_websocket]: Client connected. 2 clients total.
+[rosbridge_websocket-1] [INFO] [1795185649.958747876] [rosbridge_websocket]: [Client a0a1a5af-fadf-43d5-8e24-6ae95cf31079] Subscribed to /scan
+[rosbridge_websocket-1] [INFO] [1795185649.960034508] [rosbridge_websocket]: [Client f1d0b4f1-b9c4-4b0b-a408-df01f3d4f80e] Subscribed to /scan
+[rosbridge_websocket-1] [INFO] [1795185650.127477555] [rosbridge_websocket]: [Client f1d0b4f1-b9c4-4b0b-a408-df01f3d4f80e] Subscribed to /map
+[rosbridge_websocket-1] [INFO] [1795185650.137312420] [rosbridge_websocket]: [Client a0a1a5af-fadf-43d5-8e24-6ae95cf31079] Subscribed to /map
+[rosbridge_websocket-1] [INFO] [1795185650.145349469] [rosbridge_websocket]: [Client f1d0b4f1-b9c4-4b0b-a408-df01f3d4f80e] Subscribed to /amcl_pose
+[rosbridge_websocket-1] [INFO] [1795185650.151291542] [rosbridge_websocket]: [Client a0a1a5af-fadf-43d5-8e24-6ae95cf31079] Subscribed to /amcl_pose
+[rosbridge_websocket-1] [INFO] [1795185650.161902623] [rosbridge_websocket]: [Client f1d0b4f1-b9c4-4b0b-a408-df01f3d4f80e] Subscribed to /odom_rf2o
+[rosbridge_websocket-1] [INFO] [1795185650.170989080] [rosbridge_websocket]: [Client a0a1a5af-fadf-43d5-8e24-6ae95cf31079] Subscribed to /odom_rf2o
+[rosbridge_websocket-1] [INFO] [1795185650.179413950] [rosbridge_websocket]: [Client f1d0b4f1-b9c4-4b0b-a408-df01f3d4f80e] Subscribed to /plan
+[rosbridge_websocket-1] [INFO] [1795185650.179984783] [rosbridge_websocket]: [Client a0a1a5af-fadf-43d5-8e24-6ae95cf31079] Subscribed to /plan
