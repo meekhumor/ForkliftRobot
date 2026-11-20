@@ -1,72 +1,63 @@
-[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-20-20-08-26-402155-vishwa-247417
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-20-20-58-40-687798-vishwa-316361
 [INFO] [launch]: Default logging verbosity is set to INFO
-[INFO] [map_server-1]: process started with pid [247538]
-[INFO] [amcl-2]: process started with pid [247539]
-[INFO] [lifecycle_manager-3]: process started with pid [247540]
-[amcl-2] [INFO] [1795185507.583959074] [amcl]: 
+[INFO] [map_server-1]: process started with pid [316483]
+[INFO] [amcl-2]: process started with pid [316486]
+[INFO] [lifecycle_manager-3]: process started with pid [316488]
+[lifecycle_manager-3] [INFO] [1795188521.604452318] [lifecycle_manager_localization]: Creating
+[lifecycle_manager-3] [INFO] [1795188521.758763054] [lifecycle_manager_localization]: [34m[1mCreating and initializing lifecycle service clients[0m[0m
+[amcl-2] [INFO] [1795188522.106576558] [amcl]: 
 [amcl-2] 	amcl lifecycle node launched. 
 [amcl-2] 	Waiting on external lifecycle transitions to activate
 [amcl-2] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
-[amcl-2] [INFO] [1795185507.708028424] [amcl]: Creating
-[lifecycle_manager-3] [INFO] [1795185507.770638078] [lifecycle_manager_localization]: Creating
-[map_server-1] [INFO] [1795185507.825306109] [map_server]: 
+[amcl-2] [INFO] [1795188522.107509451] [amcl]: Creating
+[map_server-1] [INFO] [1795188522.435321182] [map_server]: 
 [map_server-1] 	map_server lifecycle node launched. 
 [map_server-1] 	Waiting on external lifecycle transitions to activate
 [map_server-1] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
-[map_server-1] [INFO] [1795185507.825625446] [map_server]: Creating
-[lifecycle_manager-3] [INFO] [1795185507.860722311] [lifecycle_manager_localization]: [34m[1mCreating and initializing lifecycle service clients[0m[0m
-[lifecycle_manager-3] [INFO] [1795185507.963213008] [lifecycle_manager_localization]: [34m[1mStarting managed nodes bringup...[0m[0m
-[lifecycle_manager-3] [INFO] [1795185507.963347892] [lifecycle_manager_localization]: [34m[1mConfiguring map_server[0m[0m
-[map_server-1] [INFO] [1795185507.975593488] [map_server]: Configuring
-[map_server-1] [INFO] [1795185507.980984023] [map_io]: Loading yaml file: /home/vishwa/Desktop/ForkliftRobot/maps/forklift_map.yaml
-[map_server-1] [INFO] [1795185507.981629899] [map_io]: resolution: 0.05
-[map_server-1] [INFO] [1795185507.981664748] [map_io]: origin[0]: -3.148
-[map_server-1] [INFO] [1795185507.981675789] [map_io]: origin[1]: -13.4
-[map_server-1] [INFO] [1795185507.981682445] [map_io]: origin[2]: 0
-[map_server-1] [INFO] [1795185507.981689549] [map_io]: free_thresh: 0.196
-[map_server-1] [INFO] [1795185507.981695885] [map_io]: occupied_thresh: 0.65
-[map_server-1] [INFO] [1795185507.981704654] [map_io]: mode: trinary
-[map_server-1] [INFO] [1795185507.981713806] [map_io]: negate: 0
-[map_server-1] [INFO] [1795185508.002818972] [map_io]: Loading image_file: /home/vishwa/Desktop/ForkliftRobot/maps/forklift_map.pgm
-[map_server-1] [INFO] [1795185508.008172610] [map_io]: Read map /home/vishwa/Desktop/ForkliftRobot/maps/forklift_map.pgm: 303 X 329 map @ 0.05 m/cell
-[lifecycle_manager-3] [INFO] [1795185508.050848173] [lifecycle_manager_localization]: [34m[1mConfiguring amcl[0m[0m
-[amcl-2] [INFO] [1795185508.053372764] [amcl]: Configuring
-[amcl-2] [INFO] [1795185508.053584354] [amcl]: initTransforms
-[amcl-2] [INFO] [1795185508.103015583] [amcl]: initPubSub
-[amcl-2] [INFO] [1795185508.201225188] [amcl]: Subscribed to map topic.
-[lifecycle_manager-3] [INFO] [1795185508.242016084] [lifecycle_manager_localization]: [34m[1mActivating map_server[0m[0m
-[map_server-1] [INFO] [1795185508.242556133] [map_server]: Activating
-[map_server-1] [INFO] [1795185508.244268794] [map_server]: Creating bond (map_server) to lifecycle manager.
-[amcl-2] [INFO] [1795185508.247517823] [amcl]: Received a 303 X 329 map @ 0.050 m/pix
-[lifecycle_manager-3] [INFO] [1795185508.404720457] [lifecycle_manager_localization]: Server map_server connected with bond.
-[lifecycle_manager-3] [INFO] [1795185508.404864397] [lifecycle_manager_localization]: [34m[1mActivating amcl[0m[0m
-[amcl-2] [INFO] [1795185508.405582596] [amcl]: Activating
-[amcl-2] [INFO] [1795185508.405677574] [amcl]: initialPoseReceived
-[amcl-2] [INFO] [1795185508.405908398] [amcl]: Setting pose (1795185508.405906): 0.000 0.000 0.000
-[amcl-2] [INFO] [1795185508.406827946] [amcl]: Creating bond (amcl) to lifecycle manager.
-[amcl-2] [INFO] [1795185508.481364209] [amcl]: createLaserObject
-[lifecycle_manager-3] [INFO] [1795185508.533055412] [lifecycle_manager_localization]: Server amcl connected with bond.
-[lifecycle_manager-3] [INFO] [1795185508.533169111] [lifecycle_manager_localization]: [34m[1mManaged nodes are active[0m[0m
-[lifecycle_manager-3] [INFO] [1795185508.533198648] [lifecycle_manager_localization]: [34m[1mCreating bond timer...[0m[0m
-[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
-[lifecycle_manager-3] [INFO] [1795185636.856867231] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[lifecycle_manager-3] [INFO] [1795185636.857149096] [lifecycle_manager_localization]: Running Nav2 LifecycleManager rcl preshutdown (lifecycle_manager_localization)
-[lifecycle_manager-3] [INFO] [1795185636.857291756] [lifecycle_manager_localization]: [34m[1mTerminating bond timer...[0m[0m
-[amcl-2] [INFO] [1795185636.856874080] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[amcl-2] [INFO] [1795185636.857145160] [amcl]: Running Nav2 LifecycleNode rcl preshutdown (amcl)
-[amcl-2] [INFO] [1795185636.857390480] [amcl]: Deactivating
-[amcl-2] [INFO] [1795185636.857467762] [amcl]: Destroying bond (amcl) to lifecycle manager.
-[map_server-1] [INFO] [1795185636.856892480] [rclcpp]: signal_handler(SIGINT/SIGTERM)
-[map_server-1] [INFO] [1795185636.857146600] [map_server]: Running Nav2 LifecycleNode rcl preshutdown (map_server)
-[map_server-1] [INFO] [1795185636.857393872] [map_server]: Deactivating
-[map_server-1] [INFO] [1795185636.857455474] [map_server]: Destroying bond (map_server) to lifecycle manager.
-[amcl-2] [INFO] [1795185636.868318114] [amcl]: Cleaning up
-[map_server-1] [INFO] [1795185636.868317794] [map_server]: Cleaning up
-[map_server-1] [INFO] [1795185636.868564970] [map_server]: Destroying bond (map_server) to lifecycle manager.
-[map_server-1] [INFO] [1795185636.888086727] [map_server]: Destroying
-[amcl-2] [INFO] [1795185636.889699801] [amcl]: Destroying bond (amcl) to lifecycle manager.
-[lifecycle_manager-3] [INFO] [1795185636.927382762] [lifecycle_manager_localization]: Destroying lifecycle_manager_localization
-[amcl-2] [INFO] [1795185636.940817706] [amcl]: Destroying
-[INFO] [map_server-1]: process has finished cleanly [pid 247538]
-[INFO] [lifecycle_manager-3]: process has finished cleanly [pid 247540]
-[INFO] [amcl-2]: process has finished cleanly [pid 247539]
+[map_server-1] [INFO] [1795188522.435663977] [map_server]: Creating
+[lifecycle_manager-3] [INFO] [1795188522.724251004] [lifecycle_manager_localization]: [34m[1mStarting managed nodes bringup...[0m[0m
+[lifecycle_manager-3] [INFO] [1795188522.724433794] [lifecycle_manager_localization]: [34m[1mConfiguring map_server[0m[0m
+[map_server-1] [INFO] [1795188522.727396446] [map_server]: Configuring
+[map_server-1] [INFO] [1795188522.727681511] [map_io]: Loading yaml file: /home/vishwa/Desktop/ForkliftRobot/maps/forklift_map.yaml
+[map_server-1] [INFO] [1795188522.728707590] [map_io]: resolution: 0.05
+[map_server-1] [INFO] [1795188522.728798089] [map_io]: origin[0]: -3.14772
+[map_server-1] [INFO] [1795188522.728814602] [map_io]: origin[1]: -2.3499
+[map_server-1] [INFO] [1795188522.728823466] [map_io]: origin[2]: 0
+[map_server-1] [INFO] [1795188522.728831658] [map_io]: free_thresh: 0.196
+[map_server-1] [INFO] [1795188522.728837771] [map_io]: occupied_thresh: 0.65
+[map_server-1] [INFO] [1795188522.728851947] [map_io]: mode: trinary
+[map_server-1] [INFO] [1795188522.728865483] [map_io]: negate: 0
+[map_server-1] [INFO] [1795188522.729441021] [map_io]: Loading image_file: /home/vishwa/Desktop/ForkliftRobot/maps/forklift_map.pgm
+[map_server-1] [INFO] [1795188522.731179667] [map_io]: Read map /home/vishwa/Desktop/ForkliftRobot/maps/forklift_map.pgm: 132 X 108 map @ 0.05 m/cell
+[lifecycle_manager-3] [INFO] [1795188522.922036528] [lifecycle_manager_localization]: [34m[1mConfiguring amcl[0m[0m
+[amcl-2] [INFO] [1795188522.930953669] [amcl]: Configuring
+[amcl-2] [INFO] [1795188522.931173132] [amcl]: initTransforms
+[amcl-2] [INFO] [1795188523.071034140] [amcl]: initPubSub
+[amcl-2] [INFO] [1795188523.169422630] [amcl]: Subscribed to map topic.
+[lifecycle_manager-3] [INFO] [1795188523.215798116] [lifecycle_manager_localization]: [34m[1mActivating map_server[0m[0m
+[map_server-1] [INFO] [1795188523.216768802] [map_server]: Activating
+[map_server-1] [INFO] [1795188523.218910213] [map_server]: Creating bond (map_server) to lifecycle manager.
+[amcl-2] [INFO] [1795188523.224810748] [amcl]: Received a 132 X 108 map @ 0.050 m/pix
+[lifecycle_manager-3] [INFO] [1795188523.364091098] [lifecycle_manager_localization]: Server map_server connected with bond.
+[lifecycle_manager-3] [INFO] [1795188523.364447045] [lifecycle_manager_localization]: [34m[1mActivating amcl[0m[0m
+[amcl-2] [INFO] [1795188523.367765580] [amcl]: Activating
+[amcl-2] [INFO] [1795188523.368168408] [amcl]: initialPoseReceived
+[amcl-2] [INFO] [1795188523.369126870] [amcl]: Setting pose (1795188523.369121): 0.000 0.000 0.000
+[amcl-2] [INFO] [1795188523.371235480] [amcl]: Creating bond (amcl) to lifecycle manager.
+[amcl-2] [INFO] [1795188523.422004734] [amcl]: createLaserObject
+[lifecycle_manager-3] [INFO] [1795188523.511124457] [lifecycle_manager_localization]: Server amcl connected with bond.
+[lifecycle_manager-3] [INFO] [1795188523.511356656] [lifecycle_manager_localization]: [34m[1mManaged nodes are active[0m[0m
+[lifecycle_manager-3] [INFO] [1795188523.511392785] [lifecycle_manager_localization]: [34m[1mCreating bond timer...[0m[0m
+[amcl-2] [INFO] [1795188527.187037977] [amcl]: Message Filter dropping message: frame 'laser' at time 1795188525.886 for reason 'the timestamp on the message is earlier than all the data in the transform cache'
+[amcl-2] [INFO] [1795188530.778144164] [amcl]: Message Filter dropping message: frame 'laser' at time 1795188528.990 for reason 'discarding message because the queue is full'
+[amcl-2] [INFO] [1795188589.004834330] [amcl]: Message Filter dropping message: frame 'laser' at time 1795188585.815 for reason 'the timestamp on the message is earlier than all the data in the transform cache'
+[lifecycle_manager-3] [INFO] [1795188591.513369673] [lifecycle_manager_localization]: [34m[1mHave not received a heartbeat from amcl.[0m[0m
+[lifecycle_manager-3] [ERROR] [1795188591.513578511] [lifecycle_manager_localization]: CRITICAL FAILURE: SERVER amcl IS DOWN after not receiving a heartbeat for 4000 ms. Shutting down related nodes.
+[lifecycle_manager-3] [INFO] [1795188591.513713972] [lifecycle_manager_localization]: [34m[1mTerminating bond timer...[0m[0m
+[lifecycle_manager-3] [INFO] [1795188591.513740308] [lifecycle_manager_localization]: [34m[1mResetting managed nodes...[0m[0m
+[lifecycle_manager-3] [INFO] [1795188591.513761045] [lifecycle_manager_localization]: [34m[1mDeactivating amcl[0m[0m
+[amcl-2] [INFO] [1795188591.842841712] [amcl]: Message Filter dropping message: frame 'laser' at time 1795188586.212 for reason 'the timestamp on the message is earlier than all the data in the transform cache'
+[amcl-2] [INFO] [1795188594.676127764] [amcl]: Message Filter dropping message: frame 'laser' at time 1795188587.135 for reason 'the timestamp on the message is earlier than all the data in the transform cache'
+[ERROR] [map_server-1]: process has died [pid 316483, exit code -9, cmd '/opt/ros/jazzy/lib/nav2_map_server/map_server --ros-args --log-level info --ros-args -r __node:=map_server -p use_sim_time:=False --params-file /tmp/launch_params_fzsgi2xi --params-file /tmp/launch_params_o_fo_mto -r /tf:=tf -r /tf_static:=tf_static'].
+[ERROR] [amcl-2]: process has died [pid 316486, exit code -9, cmd '/opt/ros/jazzy/lib/nav2_amcl/amcl --ros-args --log-level info --ros-args -r __node:=amcl -p use_sim_time:=False --params-file /tmp/launch_params_fzsgi2xi -r /tf:=tf -r /tf_static:=tf_static'].
+[ERROR] [lifecycle_manager-3]: process has died [pid 316488, exit code -9, cmd '/opt/ros/jazzy/lib/nav2_lifecycle_manager/lifecycle_manager --ros-args --log-level info --ros-args -r __node:=lifecycle_manager_localization -p use_sim_time:=False --params-file /tmp/launch_params_6j4npam8 --params-file /tmp/launch_params_ryj79lpt'].

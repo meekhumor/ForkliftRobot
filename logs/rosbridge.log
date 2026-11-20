@@ -1,21 +1,22 @@
-[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-20-20-10-46-844341-vishwa-252254
+[INFO] [launch]: All log files can be found below /home/vishwa/.ros/log/2026-11-20-20-59-58-810302-vishwa-318939
 [INFO] [launch]: Default logging verbosity is set to INFO
-[INFO] [rosbridge_websocket-1]: process started with pid [252289]
-[INFO] [rosapi_node-2]: process started with pid [252290]
-[rosbridge_websocket-1] [INFO] [1795185649.376184566] [rosbridge_websocket]: Rosbridge WebSocket server started on port 9090
-[rosbridge_websocket-1] [INFO] [1795185649.791418976] [rosbridge_websocket]: Calling services in new thread
-[rosbridge_websocket-1] [INFO] [1795185649.792451104] [rosbridge_websocket]: Sending action goals in new thread
-[rosbridge_websocket-1] [INFO] [1795185649.794694118] [rosbridge_websocket]: Client connected. 1 clients total.
-[rosbridge_websocket-1] [INFO] [1795185649.825530722] [rosbridge_websocket]: Calling services in new thread
-[rosbridge_websocket-1] [INFO] [1795185649.829764901] [rosbridge_websocket]: Sending action goals in new thread
-[rosbridge_websocket-1] [INFO] [1795185649.837639385] [rosbridge_websocket]: Client connected. 2 clients total.
-[rosbridge_websocket-1] [INFO] [1795185649.958747876] [rosbridge_websocket]: [Client a0a1a5af-fadf-43d5-8e24-6ae95cf31079] Subscribed to /scan
-[rosbridge_websocket-1] [INFO] [1795185649.960034508] [rosbridge_websocket]: [Client f1d0b4f1-b9c4-4b0b-a408-df01f3d4f80e] Subscribed to /scan
-[rosbridge_websocket-1] [INFO] [1795185650.127477555] [rosbridge_websocket]: [Client f1d0b4f1-b9c4-4b0b-a408-df01f3d4f80e] Subscribed to /map
-[rosbridge_websocket-1] [INFO] [1795185650.137312420] [rosbridge_websocket]: [Client a0a1a5af-fadf-43d5-8e24-6ae95cf31079] Subscribed to /map
-[rosbridge_websocket-1] [INFO] [1795185650.145349469] [rosbridge_websocket]: [Client f1d0b4f1-b9c4-4b0b-a408-df01f3d4f80e] Subscribed to /amcl_pose
-[rosbridge_websocket-1] [INFO] [1795185650.151291542] [rosbridge_websocket]: [Client a0a1a5af-fadf-43d5-8e24-6ae95cf31079] Subscribed to /amcl_pose
-[rosbridge_websocket-1] [INFO] [1795185650.161902623] [rosbridge_websocket]: [Client f1d0b4f1-b9c4-4b0b-a408-df01f3d4f80e] Subscribed to /odom_rf2o
-[rosbridge_websocket-1] [INFO] [1795185650.170989080] [rosbridge_websocket]: [Client a0a1a5af-fadf-43d5-8e24-6ae95cf31079] Subscribed to /odom_rf2o
-[rosbridge_websocket-1] [INFO] [1795185650.179413950] [rosbridge_websocket]: [Client f1d0b4f1-b9c4-4b0b-a408-df01f3d4f80e] Subscribed to /plan
-[rosbridge_websocket-1] [INFO] [1795185650.179984783] [rosbridge_websocket]: [Client a0a1a5af-fadf-43d5-8e24-6ae95cf31079] Subscribed to /plan
+[INFO] [rosbridge_websocket-1]: process started with pid [319001]
+[INFO] [rosapi_node-2]: process started with pid [319002]
+[rosbridge_websocket-1] [INFO] [1795188601.329264342] [rosbridge_websocket]: Rosbridge WebSocket server started on port 9090
+[rosbridge_websocket-1] [INFO] [1795188602.430478005] [rosbridge_websocket]: Calling services in new thread
+[rosbridge_websocket-1] [INFO] [1795188602.431700571] [rosbridge_websocket]: Sending action goals in new thread
+[rosbridge_websocket-1] [INFO] [1795188602.435318443] [rosbridge_websocket]: Client connected. 1 clients total.
+[rosbridge_websocket-1] [INFO] [1795188602.581447325] [rosbridge_websocket]: [Client c171f092-af58-41f9-95c7-fc3fd0171c75] Subscribed to /scan
+[rosbridge_websocket-1] [INFO] [1795188602.743655810] [rosbridge_websocket]: [Client c171f092-af58-41f9-95c7-fc3fd0171c75] Subscribed to /map
+[rosbridge_websocket-1] [INFO] [1795188602.754733210] [rosbridge_websocket]: [Client c171f092-af58-41f9-95c7-fc3fd0171c75] Subscribed to /amcl_pose
+[rosbridge_websocket-1] [INFO] [1795188602.767942547] [rosbridge_websocket]: [Client c171f092-af58-41f9-95c7-fc3fd0171c75] Subscribed to /odom_rf2o
+[rosbridge_websocket-1] [INFO] [1795188602.779462073] [rosbridge_websocket]: [Client c171f092-af58-41f9-95c7-fc3fd0171c75] Subscribed to /plan
+[rosbridge_websocket-1] [INFO] [1795188611.036962729] [rosbridge_websocket]: Calling services in new thread
+[rosbridge_websocket-1] [INFO] [1795188611.038436215] [rosbridge_websocket]: Sending action goals in new thread
+[rosbridge_websocket-1] [INFO] [1795188611.041708189] [rosbridge_websocket]: Client connected. 2 clients total.
+[rosbridge_websocket-1] [INFO] [1795188611.052361383] [rosbridge_websocket]: [Client 96cc398e-f87a-42e8-9eeb-6843de224b6b] Subscribed to /scan
+[rosbridge_websocket-1] [INFO] [1795188611.061043764] [rosbridge_websocket]: [Client 96cc398e-f87a-42e8-9eeb-6843de224b6b] Subscribed to /map
+[rosbridge_websocket-1] [INFO] [1795188611.069933960] [rosbridge_websocket]: [Client 96cc398e-f87a-42e8-9eeb-6843de224b6b] Subscribed to /amcl_pose
+[rosbridge_websocket-1] [INFO] [1795188611.079059043] [rosbridge_websocket]: [Client 96cc398e-f87a-42e8-9eeb-6843de224b6b] Subscribed to /odom_rf2o
+[rosbridge_websocket-1] [INFO] [1795188611.087547498] [rosbridge_websocket]: [Client 96cc398e-f87a-42e8-9eeb-6843de224b6b] Subscribed to /plan
+[rosbridge_websocket-1] [INFO] [1795188698.226098243] [rosbridge_websocket]: Client disconnected. 1 clients total.
