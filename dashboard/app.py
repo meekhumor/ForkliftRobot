@@ -27,7 +27,7 @@ app = Flask(__name__, template_folder="templates", static_folder="static")
 
 # ESP32 Motor Controller Configuration (communicates over phone hotspot)
 esp32_config = {
-    "ip": os.environ.get("ESP32_IP", "10.249.26.6"),
+    "ip": os.environ.get("ESP32_IP", "10.249.26.232"),
     "port": int(os.environ.get("ESP32_PORT", 80)),
     "online": False,
     "last_check": 0,
